@@ -96,7 +96,7 @@
     cursor: pointer;
   }
   .node-bg {
-    fill: rgba(13, 17, 23, 0.9);
+    fill: rgba(13, 17, 23, 0.92);
     stroke-width: 1.5;
     rx: 10; ry: 10;
     transition: stroke 0.3s, filter 0.3s;
@@ -161,13 +161,13 @@
   .link-bg {
     fill: none;
     stroke: transparent;
-    stroke-width: 8px;
+    stroke-width: 10px;
     cursor: pointer;
   }
   .link-line {
     fill: none;
     stroke: #484f58; /* Default fallback slate gray */
-    stroke-width: 2.5;
+    stroke-width: 2;
     transition: stroke 0.3s, stroke-width 0.3s;
   }
   .link-type-client .link-line {
@@ -206,7 +206,7 @@
   .link-down .link-marching, .link-unknown .link-marching { display: none; }
 
   .link-group:hover .link-line {
-    stroke-width: 4.5;
+    stroke-width: 4;
   }
 
   .port-badge {
@@ -342,6 +342,29 @@
   }
   input:checked + .slider { background-color: rgba(56, 139, 253, 0.15); border-color: #388bfd; }
   input:checked + .slider:before { transform: translateX(14px); background-color: #58a6ff; }
+
+  /* Direction segmented buttons */
+  .direction-group {
+    display: inline-flex;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .direction-opt {
+    background: transparent;
+    border: none;
+    color: #8b949e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .direction-opt.active {
+    background: rgba(56, 139, 253, 0.2);
+    color: #58a6ff;
+  }
 
   /* Device details styles */
   .detail-avatar-container {
@@ -584,11 +607,12 @@
     &#9776; Inspector
   </button>
 
-  <!-- Zoom & Center Controls -->
+  <!-- Zoom, Center & Orientation Controls -->
   <div class="map-controls">
     <button class="map-btn" onclick="zoom(1.2)" title="Zoom In">+</button>
     <button class="map-btn" onclick="zoom(0.8)" title="Zoom Out">-</button>
     <button class="map-btn" onclick="resetZoom()" title="Recenter Map">&#8982;</button>
+    <button class="map-btn" id="floating-dir-btn" onclick="toggleLayoutDirection()" title="Toggle Layout Direction (Left-to-Right / Top-to-Bottom)">&#8644;</button>
   </div>
 
   <!-- Canvas Container -->
@@ -623,6 +647,13 @@
       <!-- Controls Panel -->
       <div class="control-card">
         <h3>Map Controls</h3>
+        <div class="control-row">
+          <span>Layout Direction</span>
+          <div class="direction-group">
+            <button type="button" class="direction-opt active" id="dir-btn-lr" onclick="setLayoutDirection('LR')" title="UniFi Horizontal (Left to Right)">L &rarr; R</button>
+            <button type="button" class="direction-opt" id="dir-btn-tb" onclick="setLayoutDirection('TB')" title="Vertical (Top to Bottom)">T &darr; B</button>
+          </div>
+        </div>
         <div class="control-row">
           <span>Show Clients</span>
           <label class="switch-toggle">
@@ -670,6 +701,8 @@
   let currentFilteredNodes = [];
   let currentFilteredLinks = [];
   
+  // UniFi-style default layout: 'LR' (Left-to-Right) or 'TB' (Top-to-Bottom)
+  let layoutDirection = 'LR';
   let showClients = true;
   let showMarching = true;
   let hasInitialFitted = false;
@@ -696,9 +729,10 @@
   let pinchStartPan = { x: 0, y: 0 };
   let pinchStartCenter = { x: 0, y: 0 };
 
-  // Persistent coordinates (mac or ip -> {x, y})
+  // Session custom coordinates (only populated when user explicitly drags a node)
   const serverPositions = {{ map_positions|tojson }};
-  const positionCache = serverPositions || {};
+  const positionCache = {};
+  const userPinnedNodes = new Set();
 
   const svg = document.getElementById('map-svg');
   const viewport = document.getElementById('viewport');
@@ -811,6 +845,13 @@
     return { width, height, displayName, sublabelVal };
   }
 
+  // Extract numeric port number from strings like "Port 3" or "3" for UniFi-style port sorting
+  function extractPortNumber(portStr) {
+    if (!portStr) return 9999;
+    const match = String(portStr).match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : 9999;
+  }
+
   // Fetch topology data
   async function fetchTopology() {
     try {
@@ -863,259 +904,271 @@
     }
   }
 
-  // Auto-Layout: compute levels using BFS starting from the Router/first node
-  // and resolve bounding-box overlaps so devices never collide
+  // ==========================================
+  // UNIFI-STYLE TIDY TREE AUTO-LAYOUT
+  // ==========================================
   function computeLayout(filteredNodes, filteredLinks) {
+    if (!filteredNodes || filteredNodes.length === 0) {
+      nodes = {};
+      return;
+    }
+
+    const nodeById = {};
+    const dimsById = {};
     const adj = {};
-    const parentMap = {};
-    
-    // Initialize adjacency list
+
     filteredNodes.forEach(node => {
+      nodeById[node.id] = node;
+      dimsById[node.id] = getNodeDimensions(node);
       adj[node.id] = [];
     });
-    
+
+    // Build adjacency list with port metadata
     filteredLinks.forEach(link => {
-      // client links are strictly parent-child (source -> target)
-      // uplinks and infra links are also directed source -> target
       if (adj[link.source] && adj[link.target]) {
-        adj[link.source].push(link.target);
-        adj[link.target].push(link.source);
+        adj[link.source].push({
+          neighbor: link.target,
+          myPort: link.source_port,
+          theirPort: link.target_port
+        });
+        adj[link.target].push({
+          neighbor: link.source,
+          myPort: link.target_port,
+          theirPort: link.source_port
+        });
       }
     });
 
-    // Find the Root (prefer Internet, then Router, then switches)
-    let root = null;
+    // Find the Root (Internet -> Router -> Fritz!Box Switch -> first Switch -> first Node)
+    let rootId = null;
     const internetNodes = filteredNodes.filter(n => n.type === 'internet');
     if (internetNodes.length > 0) {
-      root = internetNodes[0].id;
+      rootId = internetNodes[0].id;
     } else {
       const routers = filteredNodes.filter(n => n.type === 'router');
       if (routers.length > 0) {
-        root = routers[0].id;
+        rootId = routers[0].id;
       } else {
         const switches = filteredNodes.filter(n => n.type === 'switch');
         if (switches.length > 0) {
-          // Prefer Fritz!Box switch node if present
-          const fritz = switches.find(n => (n.model && n.model.toLowerCase() === 'fritzbox') || n.name.toLowerCase().includes('fritz'));
-          if (fritz) {
-            root = fritz.id;
-          } else {
-            root = switches[0].id;
-          }
-        } else if (filteredNodes.length > 0) {
-          root = filteredNodes[0].id;
+          const fritz = switches.find(n => (n.model && n.model.toLowerCase() === 'fritzbox') || (n.name && n.name.toLowerCase().includes('fritz')));
+          rootId = fritz ? fritz.id : switches[0].id;
+        } else {
+          rootId = filteredNodes[0].id;
         }
       }
     }
 
-    const levels = {};
-    const queue = [];
+    // Build directed spanning tree via BFS from rootId
+    const childrenMap = {};
+    const parentPortInfo = {};
+    const depthMap = {};
     const visited = new Set();
+    filteredNodes.forEach(n => { childrenMap[n.id] = []; });
 
-    if (root) {
-      queue.push({ id: root, level: 0 });
-      visited.add(root);
+    const queue = [];
+    if (rootId) {
+      queue.push(rootId);
+      visited.add(rootId);
+      depthMap[rootId] = 0;
     }
 
     while (queue.length > 0) {
-      const curr = queue.shift();
-      levels[curr.id] = curr.level;
+      const currId = queue.shift();
+      const edges = adj[currId] || [];
 
-      const neighbors = adj[curr.id] || [];
-      neighbors.forEach(neighbor => {
-        if (!visited.has(neighbor)) {
-          visited.add(neighbor);
-          parentMap[neighbor] = curr.id;
-          queue.push({ id: neighbor, level: curr.level + 1 });
+      edges.forEach(edge => {
+        const nextId = edge.neighbor;
+        if (!visited.has(nextId)) {
+          visited.add(nextId);
+          childrenMap[currId].push(nextId);
+          parentPortInfo[nextId] = {
+            parentPort: edge.myPort,
+            childPort: edge.theirPort
+          };
+          depthMap[nextId] = depthMap[currId] + 1;
+          queue.push(nextId);
         }
       });
     }
 
-    // Place unreached/orphaned nodes on level 1
+    // Attach any unvisited/disconnected components under rootId so they participate cleanly in the tree
     filteredNodes.forEach(node => {
-      if (!(node.id in levels)) {
-        levels[node.id] = 1;
+      if (!visited.has(node.id)) {
+        visited.add(node.id);
+        if (rootId && node.id !== rootId) {
+          childrenMap[rootId].push(node.id);
+          depthMap[node.id] = 1;
+        } else {
+          depthMap[node.id] = 0;
+        }
       }
     });
 
-    // Separate infrastructure nodes and client nodes
-    const switchesAndInfraByLevel = {};
-    const clientNodes = [];
-    
-    filteredNodes.forEach(node => {
-      if (node.type === 'client') {
-        clientNodes.push(node);
-      } else {
-        const lvl = levels[node.id];
-        if (!switchesAndInfraByLevel[lvl]) switchesAndInfraByLevel[lvl] = [];
-        switchesAndInfraByLevel[lvl].push(node);
-      }
+    // Sort children of each parent in UniFi order:
+    // 1. Infrastructure devices (switches/repeaters) vs Clients grouped cleanly by parent port number, then name
+    function getTypePriority(node) {
+      if (node.type === 'internet') return 0;
+      if (node.type === 'router') return 1;
+      if (node.type === 'switch' && node.model && node.model.toLowerCase() === 'fritzbox') return 1;
+      if (node.type === 'switch') return 2;
+      if (node.type === 'unmanaged_switch') return 3;
+      if (node.type === 'repeater') return 4;
+      return 5; // client
+    }
+
+    Object.keys(childrenMap).forEach(pId => {
+      childrenMap[pId].sort((aId, bId) => {
+        const nodeA = nodeById[aId];
+        const nodeB = nodeById[bId];
+        const prioA = getTypePriority(nodeA);
+        const prioB = getTypePriority(nodeB);
+        if (prioA !== prioB) return prioA - prioB;
+
+        const portA = extractPortNumber(parentPortInfo[aId] ? parentPortInfo[aId].parentPort : nodeA.parent_port);
+        const portB = extractPortNumber(parentPortInfo[bId] ? parentPortInfo[bId].parentPort : nodeB.parent_port);
+        if (portA !== portB) return portA - portB;
+
+        return (nodeA.name || '').localeCompare(nodeB.name || '');
+      });
     });
 
-    // Group client nodes by parent switch/AP
-    const clientsByParent = {};
-    const orphanClients = [];
-    clientNodes.forEach(client => {
-      let parentId = null;
-      filteredLinks.forEach(link => {
-        if (link.target === client.id) {
-          parentId = link.source;
-        } else if (link.source === client.id && !parentId) {
-          parentId = link.target;
+    const isHorizontal = layoutDirection === 'LR';
+
+    // Step 1 (Bottom-Up): Compute required orthogonal span (height in LR mode, width in TB mode) for every subtree
+    const subtreeSpan = {};
+    const nodeOwnSpan = {};
+
+    function computeSubtreeSpan(uId) {
+      const uNode = nodeById[uId];
+      const uDims = dimsById[uId];
+      const isClient = uNode.type === 'client';
+
+      // Margin along the orthogonal axis between sibling cards
+      const siblingGap = isHorizontal ? (isClient ? 18 : 28) : (isClient ? 26 : 38);
+      const ownSpan = (isHorizontal ? uDims.height : uDims.width) + siblingGap;
+      nodeOwnSpan[uId] = ownSpan;
+
+      const children = childrenMap[uId] || [];
+      if (children.length === 0) {
+        subtreeSpan[uId] = ownSpan;
+        return ownSpan;
+      }
+
+      let childrenSum = 0;
+      children.forEach((cId, idx) => {
+        childrenSum += computeSubtreeSpan(cId);
+        // Add extra visual separation between a multi-node branch and its adjacent sibling
+        if (idx > 0) {
+          const prevId = children[idx - 1];
+          if ((childrenMap[cId] && childrenMap[cId].length > 0) || (childrenMap[prevId] && childrenMap[prevId].length > 0)) {
+            childrenSum += isHorizontal ? 20 : 28;
+          }
         }
       });
-      if (parentId && filteredNodes.some(n => n.id === parentId)) {
-        if (!clientsByParent[parentId]) clientsByParent[parentId] = [];
-        clientsByParent[parentId].push(client);
+
+      subtreeSpan[uId] = Math.max(ownSpan, childrenSum);
+      return subtreeSpan[uId];
+    }
+
+    if (rootId) {
+      computeSubtreeSpan(rootId);
+    }
+
+    // Compute primary axis coordinates per depth column/row
+    // In LR mode: primary axis is X (columns from left to right)
+    // In TB mode: primary axis is Y (rows from top to bottom)
+    const maxPrimarySizeByDepth = {};
+    filteredNodes.forEach(n => {
+      const d = depthMap[n.id] || 0;
+      const dims = dimsById[n.id];
+      const size = isHorizontal ? dims.width : dims.height;
+      maxPrimarySizeByDepth[d] = Math.max(maxPrimarySizeByDepth[d] || 0, size);
+    });
+
+    const maxDepth = Math.max(0, ...Object.keys(maxPrimarySizeByDepth).map(Number));
+    const depthCoord = {};
+    const primaryGap = isHorizontal ? 145 : 130;
+    let runningCoord = isHorizontal ? 140 : 90;
+
+    for (let d = 0; d <= maxDepth; d++) {
+      const currSize = maxPrimarySizeByDepth[d] || (isHorizontal ? 170 : 52);
+      if (d === 0) {
+        depthCoord[d] = runningCoord;
       } else {
-        orphanClients.push(client);
+        const prevSize = maxPrimarySizeByDepth[d - 1] || (isHorizontal ? 170 : 52);
+        runningCoord += (prevSize / 2) + primaryGap + (currSize / 2);
+        depthCoord[d] = runningCoord;
       }
-    });
+    }
 
-    // Precompute client cluster footprint for each parent switch/AP
-    const clientClusterMeta = {};
-    Object.keys(clientsByParent).forEach(parentId => {
-      const clients = clientsByParent[parentId];
-      const count = clients.length;
-      const maxCardWidth = Math.max(...clients.map(c => getNodeDimensions(c).width), 155);
-      const colGap = 28;
-      const colStep = maxCardWidth + colGap;
-      const rowStep = 76;
+    // Step 2 (Top-Down): Position every parent centered on its children's total span
+    const computedPos = {};
 
-      let maxCols;
-      if (count <= 3) maxCols = count;
-      else if (count <= 8) maxCols = Math.min(4, Math.ceil(count / 2));
-      else maxCols = Math.min(5, Math.ceil(Math.sqrt(count * 1.4)));
+    function assignCoordinates(uId, spanStart) {
+      const totalSpan = subtreeSpan[uId];
+      const centerOrtho = spanStart + totalSpan / 2;
+      const d = depthMap[uId] || 0;
+      const primaryPos = depthCoord[d];
 
-      const numRows = Math.ceil(count / maxCols);
-      const colsUsed = Math.min(count, maxCols);
-      const clusterWidth = colsUsed * colStep;
-      const clusterHeight = 115 + (numRows - 1) * rowStep + 30;
+      if (isHorizontal) {
+        computedPos[uId] = { x: primaryPos, y: centerOrtho };
+      } else {
+        computedPos[uId] = { x: centerOrtho, y: primaryPos };
+      }
 
-      clientClusterMeta[parentId] = {
-        clients,
-        count,
-        colStep,
-        rowStep,
-        maxCols,
-        numRows,
-        clusterWidth,
-        clusterHeight
-      };
-    });
+      const children = childrenMap[uId] || [];
+      if (children.length === 0) return;
 
-    // Base canvas reference width
+      // Calculate exact children block span including inter-branch gaps
+      let childrenBlockSpan = 0;
+      const gapsBefore = [];
+      children.forEach((cId, idx) => {
+        let extraGap = 0;
+        if (idx > 0) {
+          const prevId = children[idx - 1];
+          if ((childrenMap[cId] && childrenMap[cId].length > 0) || (childrenMap[prevId] && childrenMap[prevId].length > 0)) {
+            extraGap = isHorizontal ? 20 : 28;
+          }
+        }
+        gapsBefore.push(extraGap);
+        childrenBlockSpan += extraGap + subtreeSpan[cId];
+      });
+
+      let childCursor = centerOrtho - childrenBlockSpan / 2;
+      children.forEach((cId, idx) => {
+        childCursor += gapsBefore[idx];
+        assignCoordinates(cId, childCursor);
+        childCursor += subtreeSpan[cId];
+      });
+    }
+
+    const totalRootSpan = rootId ? subtreeSpan[rootId] : 600;
     const svgWidth = Math.max(canvasContainer.clientWidth, 960);
-    const sortedLevels = Object.keys(switchesAndInfraByLevel).map(Number).sort((a, b) => a - b);
+    const svgHeight = Math.max(canvasContainer.clientHeight, 640);
+    const initialOrthoStart = (isHorizontal ? svgHeight : svgWidth) / 2 - totalRootSpan / 2;
 
-    // 1. Layout switches and gateways level by level with dynamic subtree widths & heights
-    let currentLevelY = 80;
-    const nodeById = {};
-    filteredNodes.forEach(n => { nodeById[n.id] = n; });
+    if (rootId) {
+      assignCoordinates(rootId, initialOrthoStart);
+    }
 
-    sortedLevels.forEach(lvl => {
-      const levelNodes = switchesAndInfraByLevel[lvl];
-
-      // Sort nodes on this level by their parent's X position to minimize link crossings
-      levelNodes.sort((a, b) => {
-        const pA = parentMap[a.id] ? nodeById[parentMap[a.id]] : null;
-        const pB = parentMap[b.id] ? nodeById[parentMap[b.id]] : null;
-        const xA = pA && pA.x !== undefined ? pA.x : 0;
-        const xB = pB && pB.x !== undefined ? pB.x : 0;
-        return xA - xB;
-      });
-
-      // Compute required horizontal span for each infrastructure node
-      levelNodes.forEach(node => {
-        const dims = getNodeDimensions(node);
-        const clusterW = clientClusterMeta[node.id] ? clientClusterMeta[node.id].clusterWidth : 0;
-        node._spanWidth = Math.max(dims.width + 70, clusterW + 60);
-      });
-
-      const totalLevelSpan = levelNodes.reduce((acc, n) => acc + n._spanWidth, 0);
-      const levelSpan = Math.max(svgWidth * 0.85, totalLevelSpan);
-      let cursorX = (svgWidth - totalLevelSpan) / 2;
-      const extraGap = levelNodes.length > 1 ? Math.max(0, (levelSpan - totalLevelSpan) / levelNodes.length) : 0;
-      if (extraGap > 0) {
-        cursorX = (svgWidth - (totalLevelSpan + extraGap * levelNodes.length)) / 2;
-      }
-
-      levelNodes.forEach((node, idx) => {
-        const slotWidth = node._spanWidth + extraGap;
-        const idealX = cursorX + slotWidth / 2;
-        const idealY = currentLevelY + (levelNodes.length > 2 ? (idx % 2 === 0 ? -8 : 8) : 0);
-        cursorX += slotWidth;
-
-        if (positionCache[node.id] && typeof positionCache[node.id].x === 'number' && typeof positionCache[node.id].y === 'number') {
-          node.x = positionCache[node.id].x;
-          node.y = positionCache[node.id].y;
-        } else {
-          node.x = idealX;
-          node.y = idealY;
-          positionCache[node.id] = { x: node.x, y: node.y };
-        }
-      });
-
-      // Advance vertical coordinate for the next level so client clusters never collide with lower switches
-      const maxClusterH = Math.max(
-        0,
-        ...levelNodes.map(n => (clientClusterMeta[n.id] ? clientClusterMeta[n.id].clusterHeight : 0))
-      );
-      currentLevelY += Math.max(190, maxClusterH + 105);
-    });
-
-    // 2. Layout client nodes in non-overlapping curved fan rows under their parent switch/AP
-    Object.keys(clientClusterMeta).forEach(parentId => {
-      const parentNode = nodeById[parentId];
-      if (!parentNode) return;
-
-      const meta = clientClusterMeta[parentId];
-      meta.clients.forEach((client, idx) => {
-        if (positionCache[client.id] && typeof positionCache[client.id].x === 'number' && typeof positionCache[client.id].y === 'number') {
-          client.x = positionCache[client.id].x;
-          client.y = positionCache[client.id].y;
-        } else {
-          const row = Math.floor(idx / meta.maxCols);
-          const col = idx % meta.maxCols;
-          const colsInThisRow = Math.min(meta.maxCols, meta.count - row * meta.maxCols);
-
-          const centeredCol = col - (colsInThisRow - 1) / 2;
-          const normDist = colsInThisRow > 1 ? Math.abs(centeredCol) / ((colsInThisRow - 1) / 2) : 0;
-          // Gentle downward arc so links remain visually distinct without colliding
-          const arcOffsetY = normDist * normDist * 18;
-
-          client.x = parentNode.x + centeredCol * meta.colStep;
-          client.y = parentNode.y + 115 + row * meta.rowStep + arcOffsetY;
-
-          positionCache[client.id] = { x: client.x, y: client.y };
-        }
-      });
-    });
-
-    // 3. Layout any orphan clients or fallback nodes
-    orphanClients.forEach((client, idx) => {
-      if (positionCache[client.id] && typeof positionCache[client.id].x === 'number' && typeof positionCache[client.id].y === 'number') {
-        client.x = positionCache[client.id].x;
-        client.y = positionCache[client.id].y;
-      } else {
-        const col = idx % 4;
-        const row = Math.floor(idx / 4);
-        client.x = (svgWidth / 2) + (col - 1.5) * 210;
-        client.y = currentLevelY + row * 80;
-        positionCache[client.id] = { x: client.x, y: client.y };
-      }
-    });
-
-    // Ensure all nodes have valid x and y coordinates
+    // Apply computed positions (respecting user-dragged nodes in current session)
     filteredNodes.forEach((node, idx) => {
-      if (node.x === undefined || node.y === undefined || isNaN(node.x) || isNaN(node.y)) {
-        node.x = 140 + (idx % 5) * 210;
-        node.y = 80 + Math.floor(idx / 5) * 110;
+      if (userPinnedNodes.has(node.id) && positionCache[node.id]) {
+        node.x = positionCache[node.id].x;
+        node.y = positionCache[node.id].y;
+      } else if (computedPos[node.id]) {
+        node.x = computedPos[node.id].x;
+        node.y = computedPos[node.id].y;
+        positionCache[node.id] = { x: node.x, y: node.y };
+      } else {
+        node.x = 140 + (idx % 5) * 220;
+        node.y = 100 + Math.floor(idx / 5) * 90;
         positionCache[node.id] = { x: node.x, y: node.y };
       }
     });
 
-    // 4. Resolve any remaining bounding-box overlaps (unless user is actively dragging a node)
+    // Final safety pass: resolve any remaining bounding-box overlaps (unless user is actively dragging)
     if (!draggedNode) {
       resolveNodeCollisions(filteredNodes);
     }
@@ -1137,7 +1190,7 @@
     });
 
     const padX = 24;
-    const padY = 22;
+    const padY = 16;
     const maxIterations = 80;
 
     for (let iter = 0; iter < maxIterations; iter++) {
@@ -1157,7 +1210,6 @@
           let dx = b.x - a.x;
           let dy = b.y - a.y;
 
-          // Break exact symmetry if two nodes share identical coordinates
           if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
             dx = (j - i) * 1.5;
             dy = ((i + j) % 2 === 0 ? 1 : -1) * 0.5;
@@ -1168,11 +1220,21 @@
             const overlapX = minDx - Math.abs(dx);
             const overlapY = minDy - Math.abs(dy);
 
-            // Prefer horizontal separation when nodes are on roughly the same horizontal band
             const ratioX = overlapX / minDx;
             const ratioY = overlapY / minDy;
 
-            if (Math.abs(dy) < 36 || ratioX <= ratioY * 1.25) {
+            // In LR mode, same-column nodes should separate vertically; in TB mode, same-row nodes separate horizontally
+            if (layoutDirection === 'LR' && Math.abs(dx) < 40) {
+              const dirY = dy >= 0 ? 1 : -1;
+              const pushY = (overlapY / 2) + 1;
+              a.y -= dirY * pushY;
+              b.y += dirY * pushY;
+            } else if (layoutDirection === 'TB' && Math.abs(dy) < 36) {
+              const dirX = dx >= 0 ? 1 : -1;
+              const pushX = (overlapX / 2) + 1;
+              a.x -= dirX * pushX;
+              b.x += dirX * pushX;
+            } else if (ratioX <= ratioY) {
               const dirX = dx >= 0 ? 1 : -1;
               const pushX = (overlapX / 2) + 1;
               a.x -= dirX * pushX;
@@ -1219,6 +1281,43 @@
     renderNodes(filteredNodes);
   }
 
+  // Compute edge-to-edge anchor points and control points for UniFi-style Bezier curves
+  function getLinkGeometry(sourceNode, targetNode) {
+    const sDims = getNodeDimensions(sourceNode);
+    const tDims = getNodeDimensions(targetNode);
+    const isHorizontal = layoutDirection === 'LR';
+
+    let x1, y1, cx1, cy1, cx2, cy2, x2, y2;
+
+    if (isHorizontal) {
+      const leftToRight = sourceNode.x <= targetNode.x;
+      x1 = sourceNode.x + (leftToRight ? sDims.width / 2 : -sDims.width / 2);
+      y1 = sourceNode.y;
+      x2 = targetNode.x + (leftToRight ? -tDims.width / 2 : tDims.width / 2);
+      y2 = targetNode.y;
+
+      const midX = (x1 + x2) / 2;
+      cx1 = midX;
+      cy1 = y1;
+      cx2 = midX;
+      cy2 = y2;
+    } else {
+      const topToBottom = sourceNode.y <= targetNode.y;
+      x1 = sourceNode.x;
+      y1 = sourceNode.y + (topToBottom ? sDims.height / 2 : -sDims.height / 2);
+      x2 = targetNode.x;
+      y2 = targetNode.y + (topToBottom ? -tDims.height / 2 : tDims.height / 2);
+
+      const midY = (y1 + y2) / 2;
+      cx1 = x1;
+      cy1 = midY;
+      cx2 = x2;
+      cy2 = midY;
+    }
+
+    return { x1, y1, cx1, cy1, cx2, cy2, x2, y2 };
+  }
+
   function renderLinks(filteredLinks) {
     const container = document.getElementById('links-group');
     container.innerHTML = '';
@@ -1228,19 +1327,14 @@
       const targetNode = nodes[link.target];
       if (!sourceNode || !targetNode) return;
 
-      // Draw a smooth S-curve Bezier path between nodes
-      const x1 = sourceNode.x;
-      const y1 = sourceNode.y;
-      const x2 = targetNode.x;
-      const y2 = targetNode.y;
-
-      const midY = (y1 + y2) / 2;
-      const pathData = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+      const geom = getLinkGeometry(sourceNode, targetNode);
+      const pathData = `M ${geom.x1} ${geom.y1} C ${geom.cx1} ${geom.cy1}, ${geom.cx2} ${geom.cy2}, ${geom.x2} ${geom.y2}`;
 
       const speedClass = `link-${(link.speed || '').toLowerCase().replace('/', '').replace('.', '_')}`;
+      const typeClass = link.type ? `link-type-${link.type}` : '';
       
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', `link-group ${speedClass}`);
+      g.setAttribute('class', `link-group ${speedClass} ${typeClass}`);
       g.setAttribute('id', `link-group-${idx}`);
 
       // Transparent thick background path for easier hovering
@@ -1263,14 +1357,14 @@
       g.appendChild(linePath);
       g.appendChild(marchPath);
 
-      // Render port speed label badge at 25% and 75% along the Bezier curve path
+      // Render port speed label badge along the Bezier curve path
       if (link.source_port && link.source_port !== 'unknown') {
-        const pt = getBezierPoint(0.25, x1, y1, x2, y2);
-        g.appendChild(createPortBadge(pt.x, pt.y - 8, link.source_port.replace('Port ', 'P'), 'source-badge'));
+        const pt = evalBezier(0.2, geom);
+        g.appendChild(createPortBadge(pt.x, pt.y, link.source_port.replace('Port ', 'P'), 'source-badge'));
       }
       if (link.target_port && link.target_port !== 'unknown') {
-        const pt = getBezierPoint(0.75, x1, y1, x2, y2);
-        g.appendChild(createPortBadge(pt.x, pt.y + 8, link.target_port.replace('Port ', 'P'), 'target-badge'));
+        const pt = evalBezier(0.8, geom);
+        g.appendChild(createPortBadge(pt.x, pt.y, link.target_port.replace('Port ', 'P'), 'target-badge'));
       }
 
       // Tooltip triggers
@@ -1282,22 +1376,16 @@
     });
   }
 
-  // Cubic Bezier curve calculator
-  function getBezierPoint(t, x1, y1, x2, y2) {
-    const midY = (y1 + y2) / 2;
-    const cx1 = x1;
-    const cy1 = midY;
-    const cx2 = x2;
-    const cy2 = midY;
-
+  // Evaluate a cubic Bezier curve at parameter t in [0, 1]
+  function evalBezier(t, geom) {
     const mt = 1 - t;
     const mt2 = mt * mt;
     const mt3 = mt2 * mt;
     const t2 = t * t;
     const t3 = t2 * t;
 
-    const x = mt3 * x1 + 3 * mt2 * t * cx1 + 3 * mt * t2 * cx2 + t3 * x2;
-    const y = mt3 * y1 + 3 * mt2 * t * cy1 + 3 * mt * t2 * cy2 + t3 * y2;
+    const x = mt3 * geom.x1 + 3 * mt2 * t * geom.cx1 + 3 * mt * t2 * geom.cx2 + t3 * geom.x2;
+    const y = mt3 * geom.y1 + 3 * mt2 * t * geom.cy1 + 3 * mt * t2 * geom.cy2 + t3 * geom.y2;
 
     return { x, y };
   }
@@ -1350,8 +1438,8 @@
       highlightRing.setAttribute('r', '36');
       highlightRing.setAttribute('cx', '0');
       highlightRing.setAttribute('cy', '0');
-      highlightRing.style.display = 'none';
       highlightRing.setAttribute('id', `highlight-${node.id}`);
+      highlightRing.style.display = 'none';
       g.appendChild(highlightRing);
 
       // Glassmorphism card rectangle
@@ -1505,6 +1593,7 @@
       return;
     }
 
+    userPinnedNodes.add(targetNode.id);
     await savePositionsToServer();
   }
 
@@ -1582,6 +1671,7 @@
       return;
     }
 
+    userPinnedNodes.add(targetNode.id);
     await savePositionsToServer();
   }
 
@@ -1771,7 +1861,7 @@
 
     const scaleX = (containerWidth - padX * 2) / boundsWidth;
     const scaleY = (containerHeight - padY * 2) / boundsHeight;
-    zoomScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.2), 1.15);
+    zoomScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.18), 1.15);
 
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
@@ -1792,9 +1882,37 @@
   // ==========================================
   // CONTROLS & SIDEBAR HANDLERS
   // ==========================================
+  function setLayoutDirection(dir) {
+    if (dir !== 'LR' && dir !== 'TB') return;
+    layoutDirection = dir;
+
+    const btnLr = document.getElementById('dir-btn-lr');
+    const btnTb = document.getElementById('dir-btn-tb');
+    const floatingBtn = document.getElementById('floating-dir-btn');
+    if (btnLr && btnTb) {
+      btnLr.classList.toggle('active', dir === 'LR');
+      btnTb.classList.toggle('active', dir === 'TB');
+    }
+    if (floatingBtn) {
+      floatingBtn.innerHTML = dir === 'LR' ? '&#8644;' : '&#8645;';
+    }
+
+    userPinnedNodes.clear();
+    for (let key in positionCache) {
+      delete positionCache[key];
+    }
+    processAndRender();
+    fitMapToScreen();
+  }
+
+  function toggleLayoutDirection() {
+    setLayoutDirection(layoutDirection === 'LR' ? 'TB' : 'LR');
+  }
+
   function handleClientToggle() {
     showClients = document.getElementById('toggle-clients').checked;
     processAndRender();
+    fitMapToScreen();
   }
 
   function handleMarchingToggle() {
@@ -2184,9 +2302,7 @@
   }
 
   async function resetLayout() {
-    if (!confirm("Are you sure you want to reset the map layout? This will clear all custom device coordinates and cannot be undone.")) {
-      return;
-    }
+    userPinnedNodes.clear();
     for (let key in positionCache) {
       delete positionCache[key];
     }
@@ -2235,6 +2351,7 @@
         body: JSON.stringify({ mac: mac })
       });
       toggleSidebar(false);
+      userPinnedNodes.delete(mac);
       delete positionCache[mac];
       fetchTopology();
     } catch (e) {
