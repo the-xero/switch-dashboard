@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ title }} - Host Connection History</title>
+<title>{{ title }} - {{ t('scanner_history.page_title') }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -58,7 +60,7 @@
   }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0b0e14;
     color: #e1e4e8;
     padding: 24px;
@@ -89,7 +91,7 @@
     gap: 14px;
   }
   .header h1 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.5px;
@@ -565,26 +567,26 @@
 
 <div class="header">
   <div class="header-left">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
-    <h1>Host Connection Timeline</h1>
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <h1>{{ t('scanner_history.header_title') }}</h1>
   </div>
   <div class="nav-links">
     <span class="status">
       <span class="dot" id="live-dot"></span>
-      <span id="live-text">Live Polling</span>
+      <span id="live-text">{{ t('status.live_polling') }}</span>
     </span>
-    <span class="font-sizes" title="Font size">
+    <span class="font-sizes" title="{{ t('common.font_size_title') }}">
       <button class="fs-btn" data-size="sm" onclick="setFontSize('sm')">S</button>
       <button class="fs-btn fs-active" data-size="md" onclick="setFontSize('md')">M</button>
       <button class="fs-btn" data-size="lg" onclick="setFontSize('lg')">L</button>
       <button class="fs-btn" data-size="xl" onclick="setFontSize('xl')">XL</button>
     </span>
-    <a href="/">📊 Dashboard</a>
-    <a href="/map">🕸️ Network Map</a>
-    <a href="/scanner">🌐 Scanner</a>
-    <a href="/config">&#9881; Config</a>
-    <a href="/backups">💾 Backups</a>
-    <a href="/logs">📋 Logs</a>
+    <a href="/">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs">📋 {{ t('nav.logs') }}</a>
   </div>
 </div>
 
@@ -593,24 +595,24 @@
   <div class="card">
     <div class="filter-panel">
       <div class="filter-item">
-        <label for="filter-ip">IP Address</label>
-        <input type="text" id="filter-ip" class="filter-input" placeholder="Filter IP...">
+        <label for="filter-ip">{{ t('scanner_history.filters.ip_address') }}</label>
+        <input type="text" id="filter-ip" class="filter-input" placeholder="{{ t('scanner_history.filters.ip_placeholder') }}">
       </div>
       <div class="filter-item">
-        <label for="filter-hostname">Hostname</label>
-        <input type="text" id="filter-hostname" class="filter-input" placeholder="Filter Hostname...">
+        <label for="filter-hostname">{{ t('scanner_history.filters.hostname') }}</label>
+        <input type="text" id="filter-hostname" class="filter-input" placeholder="{{ t('scanner_history.filters.hostname_placeholder') }}">
       </div>
       <div class="filter-item">
-        <label for="filter-start-date">From</label>
+        <label for="filter-start-date">{{ t('scanner_history.filters.from') }}</label>
         <input type="datetime-local" id="filter-start-date" class="filter-input">
       </div>
       <div class="filter-item">
-        <label for="filter-end-date">To</label>
+        <label for="filter-end-date">{{ t('scanner_history.filters.to') }}</label>
         <input type="datetime-local" id="filter-end-date" class="filter-input">
       </div>
       <div style="flex-grow: 1;"></div>
-      <button class="btn btn-danger" id="clear-history-button" title="Delete all history events">
-        <span class="mdi mdi-delete-sweep"></span> Clear All History
+      <button class="btn btn-danger" id="clear-history-button" title="{{ t('scanner_history.filters.clear_all_title') }}">
+        <span class="mdi mdi-delete-sweep"></span> {{ t('scanner_history.filters.clear_all') }}
       </button>
     </div>
 
@@ -622,18 +624,18 @@
             <span class="slider"></span>
           </label>
           <span class="switch-label" onclick="document.getElementById('auto-refresh-checkbox').click();">
-            Auto Refresh
+            {{ t('scanner_history.controls.auto_refresh') }}
           </span>
         </div>
         <div class="refresh-interval-input-container">
-          <label for="refresh-interval-input">every</label>
+          <label for="refresh-interval-input">{{ t('scanner_history.controls.every') }}</label>
           <input type="number" id="refresh-interval-input" min="10" value="60">
-          <label for="refresh-interval-input">s</label>
+          <label for="refresh-interval-input">{{ t('scanner_history.controls.sec_unit') }}</label>
         </div>
       </div>
       <div class="control-group">
         <a href="/scanner" class="btn btn-secondary">
-          <span class="mdi mdi-arrow-left"></span> Back to Scanner
+          <span class="mdi mdi-arrow-left"></span> {{ t('nav.back_to_scanner') }}
         </a>
       </div>
     </div>
@@ -648,14 +650,14 @@
         </colgroup>
         <thead>
           <tr>
-            <th class="action-cell-header">Del</th>
-            <th>IP Address</th>
-            <th>Hostname</th>
-            <th>Connection Status Timeline (Newest Segment on Right)</th>
+            <th class="action-cell-header">{{ t('scanner_history.table.col_del') }}</th>
+            <th>{{ t('scanner_history.table.col_ip') }}</th>
+            <th>{{ t('scanner_history.table.col_hostname') }}</th>
+            <th>{{ t('scanner_history.table.col_timeline') }}</th>
           </tr>
         </thead>
         <tbody id="history-tbody">
-          <tr><td colspan="4" style="padding: 24px; text-align: center; color: #8b949e;">Loading history...</td></tr>
+          <tr><td colspan="4" style="padding: 24px; text-align: center; color: #8b949e;">{{ t('scanner_history.table.loading') }}</td></tr>
         </tbody>
       </table>
     </div>
@@ -665,20 +667,20 @@
 
 <div class="footer">
   <div>
-    <a href="/" style="color:#8b949e; text-decoration: none;">Dashboard</a> &middot; 
-    <a href="/config" style="color:#8b949e; text-decoration: none;">Switch Config</a> &middot; 
-    <a href="/backups" style="color:#8b949e; text-decoration: none;">Backups Manager</a> &middot; 
-    <a href="/api-docs" style="color:#8b949e; text-decoration: none;">API Reference</a> &middot; 
-    <a href="/logs" style="color:#8b949e; text-decoration: none;">Logs</a> &middot;
+    <a href="/" style="color:#8b949e; text-decoration: none;">{{ t('nav.dashboard') }}</a> &middot; 
+    <a href="/config" style="color:#8b949e; text-decoration: none;">{{ t('nav.switch_config') }}</a> &middot; 
+    <a href="/backups" style="color:#8b949e; text-decoration: none;">{{ t('nav.backups_manager') }}</a> &middot; 
+    <a href="/api-docs" style="color:#8b949e; text-decoration: none;">{{ t('nav.api_reference') }}</a> &middot; 
+    <a href="/logs" style="color:#8b949e; text-decoration: none;">{{ t('nav.logs') }}</a> &middot;
     <span class="version-badge">v{{ version }}</span>
   </div>
-  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
 </div>
 
 <!-- Toast notification box -->
 <div class="toast" id="toast-box">
   <span id="toast-icon">✓</span>
-  <span id="toast-message">Action completed successfully</span>
+  <span id="toast-message">{{ t('common.action_completed') }}</span>
 </div>
 
 <script>
@@ -741,11 +743,11 @@ function showToast(message, type = 'success', icon = '✓') {
 }
 
 function formatTooltipTime(isoString) {
-  if (!isoString) return 'N/A';
+  if (!isoString) return t('common.na');
   try {
     const d = new Date(isoString);
     if (isNaN(d)) return isoString;
-    return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'medium' });
+    return d.toLocaleString(window.I18N_LOCALE || undefined, { dateStyle: 'short', timeStyle: 'medium' });
   } catch (e) {
     return isoString;
   }
@@ -755,10 +757,10 @@ function updateStatusDot(active) {
   if (!liveDot || !liveText) return;
   if (active) {
     liveDot.className = "dot";
-    liveText.textContent = "Live Polling";
+    liveText.textContent = t("status.live_polling");
   } else {
     liveDot.className = "dot paused";
-    liveText.textContent = "Polling Paused";
+    liveText.textContent = t("status.polling_paused");
   }
 }
 
@@ -836,7 +838,7 @@ function renderHistoryTable(filterStartUTC, filterEndUTC) {
   });
 
   if (sortedIPs.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="4" style="padding: 24px; text-align: center; color:#8b949e;">No host history matches current filters.</td></tr>';
+    tableBody.innerHTML = `<tr><td colspan="4" style="padding: 24px; text-align: center; color:#8b949e;">${t('scanner_history.table.empty')}</td></tr>`;
     return;
   }
 
@@ -847,7 +849,7 @@ function renderHistoryTable(filterStartUTC, filterEndUTC) {
     // Delete column
     const delCell = row.insertCell(0);
     delCell.className = 'action-cell';
-    delCell.innerHTML = `<span class="mdi mdi-delete delete-icon history-delete-icon" title="Clear history for ${ip}" data-ip="${ip}"></span>`;
+    delCell.innerHTML = `<span class="mdi mdi-delete delete-icon history-delete-icon" title="${t('scanner_history.table.delete_title', { ip: ip })}" data-ip="${ip}"></span>`;
     
     // IP
     const ipCell = row.insertCell(1);
@@ -885,7 +887,7 @@ function renderHistoryTable(filterStartUTC, filterEndUTC) {
         seg.className = 'timeline-segment';
         seg.classList.add(e.status === 1 ? 'online' : 'offline');
         
-        const tooltipTextVal = `${e.status === 1 ? 'Online' : 'Offline'} at ${formatTooltipTime(e.event_time)}`;
+        const tooltipTextVal = t('scanner_history.table.event_tooltip', { status: e.status === 1 ? t('common.online') : t('common.offline'), time: formatTooltipTime(e.event_time) });
         seg.title = tooltipTextVal;
 
         const tooltip = document.createElement('span');
@@ -896,7 +898,7 @@ function renderHistoryTable(filterStartUTC, filterEndUTC) {
         barContainer.appendChild(seg);
       });
     } else {
-      barContainer.textContent = "No status events in selected date range.";
+      barContainer.textContent = t("scanner_history.table.no_events_in_range");
       barContainer.style.cssText = "text-align: center; color: #8b949e; font-size: 11.5px; padding: 3px; line-height: 16px; width: 100%; display: flex; justify-content: center; align-items: center; background: rgba(22, 27, 34, 0.4);";
     }
     
@@ -908,51 +910,51 @@ function renderHistoryTable(filterStartUTC, filterEndUTC) {
 async function fetchHistory() {
   try {
     const res = await fetch('/api/scanner/history');
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    if (!res.ok) throw new Error(t("common.http_error", { status: res.status }));
     allHistoryData = await res.json();
     filterAndRender();
   } catch(err) {
     console.error("Fetch history error:", err);
     if (tableBody && Object.keys(allHistoryData).length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="4" style="color:#f85149;text-align:center;padding:16px;">Error loading data: ${err.message}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="4" style="color:#f85149;text-align:center;padding:16px;">${t('scanner_history.table.error_loading', { error: err.message })}</td></tr>`;
     }
   }
 }
 
 async function handleDeleteHistory(ip) {
-  if (!ip || !window.confirm(`Delete ALL connection history events for ${ip}? This action is permanent.`)) return;
+  if (!ip || !window.confirm(t("scanner_history.toast.confirm_delete_host", { ip: ip }))) return;
   try {
     const res = await fetch(`/api/scanner/history/${ip}`, { method: 'DELETE' });
     const result = await res.json();
-    if (!res.ok || !result.success) throw new Error(result.error || "Clear failed");
+    if (!res.ok || !result.success) throw new Error(result.error || t("scanner_history.toast.clear_failed"));
     
-    showToast(`History for ${ip} cleared successfully`, 'success', '🗑️');
+    showToast(t('scanner_history.toast.history_cleared', { ip: ip }), 'success', '🗑️');
     delete allHistoryData[ip];
     filterAndRender();
   } catch(err) {
-    showToast(`Clear failed: ${err.message}`, 'error', '⚠️');
+    showToast(t('scanner_history.toast.clear_error', { error: err.message }), 'error', '⚠️');
   }
 }
 
 async function handleClearAllHistory() {
-  if (!window.confirm("WARNING: This will permanently delete ALL network connection history events for ALL hosts in the database. Are you absolutely sure?")) return;
+  if (!window.confirm(t("scanner_history.toast.confirm_clear_all"))) return;
   
   clearHistoryButton.disabled = true;
-  clearHistoryButton.textContent = "Clearing...";
+  clearHistoryButton.textContent = t("scanner_history.filters.clearing");
   try {
     const res = await fetch('/api/scanner/history/all', { method: 'DELETE' });
     const result = await res.json();
-    if (!res.ok || !result.success) throw new Error(result.error || "Clear all failed");
+    if (!res.ok || !result.success) throw new Error(result.error || t("scanner_history.toast.clear_all_failed"));
     
-    showToast("All connection history permanently cleared", 'success', '🗑️');
+    showToast(t("scanner_history.toast.all_cleared"), 'success', '🗑️');
     allHistoryData = {};
     filteredHostsList = [];
     renderHistoryTable(null, null);
   } catch (err) {
-    showToast(`Clear all failed: ${err.message}`, 'error', '⚠️');
+    showToast(t('scanner_history.toast.clear_all_error', { error: err.message }), 'error', '⚠️');
   } finally {
     clearHistoryButton.disabled = false;
-    clearHistoryButton.innerHTML = '<span class="mdi mdi-delete-sweep"></span> Clear All History';
+    clearHistoryButton.innerHTML = `<span class="mdi mdi-delete-sweep"></span> ${t('scanner_history.filters.clear_all')}`;
   }
 }
 
@@ -977,10 +979,10 @@ function handleRefreshToggleChange() {
   updateStatusDot(isAutoRefreshEnabled);
   if (isAutoRefreshEnabled) {
     startAutoRefresh();
-    showToast("Auto-refresh active", 'success', '▶️');
+    showToast(t("scanner_history.toast.auto_refresh_active"), 'success', '▶️');
   } else {
     stopAutoRefresh();
-    showToast("Auto-refresh paused", 'success', '⏸️');
+    showToast(t("scanner_history.toast.auto_refresh_paused"), 'success', '⏸️');
   }
 }
 

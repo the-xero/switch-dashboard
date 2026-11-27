@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ title }} - System Logs</title>
+<title>{{ title }} - {{ t('logs.page_title') }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,7 +13,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0b0e14;
     color: #e1e4e8;
     padding: 24px;
@@ -42,7 +44,7 @@
     gap: 14px;
   }
   .header h1 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.5px;
@@ -377,16 +379,16 @@
 
 <div class="header">
   <div class="header-left">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
-    <h1>Switch Dashboard Logs</h1>
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <h1>{{ t('logs.header_title') }}</h1>
   </div>
   <div class="nav-links">
-    <a href="/">📊 Dashboard</a>
-    <a href="/map">🕸️ Network Map</a>
-    <a href="/scanner">🌐 Scanner</a>
-    <a href="/config">&#9881; Config</a>
-    <a href="/backups">💾 Backups</a>
-    <a href="/logs" class="active">📋 Logs</a>
+    <a href="/">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs" class="active">📋 {{ t('nav.logs') }}</a>
   </div>
 </div>
 
@@ -395,17 +397,17 @@
     <div class="controls-bar">
       <!-- Left side: Log level select -->
       <div class="control-group">
-        <label for="log-level-select">Log Level Mode:</label>
+        <label for="log-level-select">{{ t('logs.log_level_label') }}</label>
         <select id="log-level-select" onchange="updateLogLevel(this.value)">
-          <option value="DEBUG" {% if current_log_level == 'DEBUG' %}selected{% endif %}>DEBUG (Detailed)</option>
-          <option value="INFO" {% if current_log_level == 'INFO' %}selected{% endif %}>INFO (Standard)</option>
-          <option value="WARNING" {% if current_log_level == 'WARNING' or current_log_level == 'WARN' %}selected{% endif %}>WARNING (Warnings)</option>
-          <option value="ERROR" {% if current_log_level == 'ERROR' %}selected{% endif %}>ERROR (Errors Only)</option>
-          <option value="CRITICAL" {% if current_log_level == 'CRITICAL' %}selected{% endif %}>CRITICAL (System Failures)</option>
-          <option value="NONE" {% if current_log_level == 'NONE' %}selected{% endif %}>NONE (Fully Silenced)</option>
+          <option value="DEBUG" {% if current_log_level == 'DEBUG' %}selected{% endif %}>{{ t('logs.levels.debug') }}</option>
+          <option value="INFO" {% if current_log_level == 'INFO' %}selected{% endif %}>{{ t('logs.levels.info') }}</option>
+          <option value="WARNING" {% if current_log_level == 'WARNING' or current_log_level == 'WARN' %}selected{% endif %}>{{ t('logs.levels.warning') }}</option>
+          <option value="ERROR" {% if current_log_level == 'ERROR' %}selected{% endif %}>{{ t('logs.levels.error') }}</option>
+          <option value="CRITICAL" {% if current_log_level == 'CRITICAL' %}selected{% endif %}>{{ t('logs.levels.critical') }}</option>
+          <option value="NONE" {% if current_log_level == 'NONE' %}selected{% endif %}>{{ t('logs.levels.none') }}</option>
         </select>
         <span style="font-size: 11px; color: #8b949e; max-width: 250px;">
-          💡 Changes apply <b>dynamically</b> to the running background crawler thread instantly.
+          💡 {{ t('logs.dynamic_hint_html')|safe }}
         </span>
       </div>
 
@@ -413,13 +415,13 @@
       <div class="control-group" style="flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="toggleAutoRefresh()">
           <span class="refresh-indicator active" id="refresh-dot"></span>
-          <span id="refresh-btn-text">Polling Active</span>
+          <span id="refresh-btn-text">{{ t('status.polling_active') }}</span>
         </button>
-        <a class="btn btn-primary" href="/api/logs/download" title="Download log file">
-          <span>⬇️</span> Download Log
+        <a class="btn btn-primary" href="/api/logs/download" title="{{ t('logs.download_log_title') }}">
+          <span>⬇️</span> {{ t('logs.download_log') }}
         </a>
-        <button class="btn btn-danger" onclick="clearLogs()" title="Clear server-side log file">
-          <span>🗑️</span> Clear Logs
+        <button class="btn btn-danger" onclick="clearLogs()" title="{{ t('logs.clear_logs_title') }}">
+          <span>🗑️</span> {{ t('logs.clear_logs') }}
         </button>
       </div>
     </div>
@@ -429,15 +431,15 @@
       <div class="terminal-console" id="console-screen">
         <div class="empty-logs" id="empty-state">
           <div class="empty-icon">📂</div>
-          <h3>No log files found or log is currently empty</h3>
-          <p>Ensure background switch scraper threads are active or trigger actions to generate system telemetry events.</p>
+          <h3>{{ t('logs.empty.title') }}</h3>
+          <p>{{ t('logs.empty.desc') }}</p>
         </div>
         <div id="logs-container" style="display: none;"></div>
       </div>
       
       <!-- Floating Autoscroll Banner -->
       <div id="autoscroll-banner" style="display: none; position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(33, 38, 45, 0.95); border: 1px solid #58a6ff; backdrop-filter: blur(12px); color: #58a6ff; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 10; align-items: center; gap: 8px; transition: all 0.2s ease-in-out;" onclick="resumeAutoscrollClick()" onmouseover="this.style.background='#58a6ff'; this.style.color='#0d1117';" onmouseout="this.style.background='rgba(33, 38, 45, 0.95)'; this.style.color='#58a6ff';">
-        <span>⬇️ Auto-scroll Paused. Click to resume</span>
+        <span>⬇️ {{ t('logs.autoscroll_paused') }}</span>
       </div>
     </div>
   </div>
@@ -445,19 +447,19 @@
 
 <div class="footer">
   <div>
-    <a href="/" style="color:#8b949e; text-decoration: none;">Dashboard</a> &middot; 
-    <a href="/config" style="color:#8b949e; text-decoration: none;">Switch Config</a> &middot; 
-    <a href="/backups" style="color:#8b949e; text-decoration: none;">Backups Manager</a> &middot; 
-    <a href="/api-docs" style="color:#8b949e; text-decoration: none;">API Reference</a> &middot; 
+    <a href="/" style="color:#8b949e; text-decoration: none;">{{ t('nav.dashboard') }}</a> &middot; 
+    <a href="/config" style="color:#8b949e; text-decoration: none;">{{ t('nav.switch_config') }}</a> &middot; 
+    <a href="/backups" style="color:#8b949e; text-decoration: none;">{{ t('nav.backups_manager') }}</a> &middot; 
+    <a href="/api-docs" style="color:#8b949e; text-decoration: none;">{{ t('nav.api_reference') }}</a> &middot; 
     <span class="version-badge">v{{ version }}</span>
   </div>
-  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
 </div>
 
 <!-- Toast notification box -->
 <div class="toast" id="toast-box">
   <span id="toast-icon">✓</span>
-  <span id="toast-message">Action completed successfully</span>
+  <span id="toast-message">{{ t('common.action_completed') }}</span>
 </div>
 
 <script>
@@ -502,7 +504,7 @@ function startPolling() {
   const dot = document.getElementById("refresh-dot");
   const text = document.getElementById("refresh-btn-text");
   dot.classList.add("active");
-  text.textContent = "Polling Active";
+  text.textContent = t("status.polling_active");
 }
 
 function stopPolling() {
@@ -512,27 +514,27 @@ function stopPolling() {
   const dot = document.getElementById("refresh-dot");
   const text = document.getElementById("refresh-btn-text");
   dot.classList.remove("active");
-  text.textContent = "Polling Paused";
+  text.textContent = t("status.polling_paused");
 }
 
 function toggleAutoRefresh() {
   if (isPollingActive) {
     stopPolling();
-    showToast("Auto-refresh paused", "success", "⏸️");
+    showToast(t("logs.toast.auto_refresh_paused"), "success", "⏸️");
   } else {
     startPolling();
-    showToast("Auto-refresh resumed", "success", "▶️");
+    showToast(t("logs.toast.auto_refresh_resumed"), "success", "▶️");
   }
 }
 
 async function fetchLogs() {
   try {
     const res = await fetch("/api/logs");
-    if (!res.ok) throw new Error("HTTP error " + res.status);
+    if (!res.ok) throw new Error(t("common.http_error", { status: res.status }));
     const data = await res.json();
     
     if (data.error) {
-      showErrorToast("Failed to fetch logs: " + data.error);
+      showErrorToast(t("logs.toast.fetch_failed", { error: data.error }));
       return;
     }
     
@@ -674,19 +676,19 @@ async function updateLogLevel(level) {
     const data = await res.json();
     
     if (res.ok && data.status === "ok") {
-      showToast(`Log level dynamically changed to ${level}`, "success", "⚙️");
+      showToast(t("logs.toast.level_changed", { level: level }), "success", "⚙️");
       // Fetch logs immediately to display the server confirmation log
       setTimeout(fetchLogs, 400);
     } else {
-      showErrorToast("Failed to update log level: " + (data.error || "Unknown error"));
+      showErrorToast(t("logs.toast.level_update_failed", { error: data.error || t("common.unknown_error") }));
     }
   } catch (err) {
-    showErrorToast("Network error: " + err.message);
+    showErrorToast(t("logs.toast.network_error", { error: err.message }));
   }
 }
 
 async function clearLogs() {
-  if (!confirm("Are you sure you want to permanently clear the log file on the server? This will truncate the file immediately.")) {
+  if (!confirm(t("logs.toast.confirm_clear"))) {
     return;
   }
   
@@ -695,16 +697,16 @@ async function clearLogs() {
     const data = await res.json();
     
     if (res.ok && data.status === "ok") {
-      showToast("Logs successfully cleared on server", "success", "🗑️");
+      showToast(t("logs.toast.cleared"), "success", "🗑️");
       lastRenderedLines = [];
       document.getElementById("logs-container").innerHTML = "";
       document.getElementById("empty-state").style.display = "flex";
       document.getElementById("logs-container").style.display = "none";
     } else {
-      showErrorToast("Failed to clear logs: " + (data.error || "Unknown error"));
+      showErrorToast(t("logs.toast.clear_failed", { error: data.error || t("common.unknown_error") }));
     }
   } catch (err) {
-    showErrorToast("Network error: " + err.message);
+    showErrorToast(t("logs.toast.network_error", { error: err.message }));
   }
 }
 
@@ -713,7 +715,7 @@ function resumeAutoscrollClick() {
   document.getElementById("autoscroll-banner").style.display = "none";
   const consoleScreen = document.getElementById("console-screen");
   consoleScreen.scrollTop = consoleScreen.scrollHeight;
-  showToast("Auto-scroll resumed", "success", "⬇️");
+  showToast(t("logs.toast.autoscroll_resumed"), "success", "⬇️");
 }
 
 // Helpers

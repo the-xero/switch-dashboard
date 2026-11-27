@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ title }} - Settings</title>
+<title>{{ title }} - {{ t('config.page_title') }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128252;</text></svg>">
 <!-- CodeMirror Styles and Scripts from CDN for YAML Syntax Highlighting -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
@@ -13,7 +15,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0d0f14; color: #e1e4e8; padding: 20px;
     background-image: radial-gradient(circle at 10% 20%, rgba(20, 24, 33, 0.8) 0%, rgba(13, 15, 20, 1) 90.2%);
     background-attachment: fixed;
@@ -360,24 +362,24 @@
 <body>
 <div class="header">
   <div style="display: flex; align-items: center; gap: 14px;">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
-    <h1>&#9881; Node Settings</h1>
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <h1>&#9881; {{ t('config.header_title') }}</h1>
   </div>
   <div class="nav-links">
-    <a href="/">📊 Dashboard</a>
-    <a href="/map">🕸️ Network Map</a>
-    <a href="/scanner">🌐 Scanner</a>
-    <a href="/config" class="active">&#9881; Config</a>
-    <a href="/backups">💾 Backups</a>
-    <a href="/logs">📋 Logs</a>
+    <a href="/">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config" class="active">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs">📋 {{ t('nav.logs') }}</a>
   </div>
 </div>
 
 {% if saved %}
 <div class="card" style="max-width:1400px; margin: 0 auto 24px auto;">
-  <div class="success-msg">&#10003; Configuration saved. Dashboard is reloading with new settings...</div>
+  <div class="success-msg">&#10003; {{ t('config.saved_msg') }}</div>
   <div class="btn-row">
-    <a href="/">Return to Dashboard</a>
+    <a href="/">{{ t('nav.return_to_dashboard') }}</a>
   </div>
 </div>
 {% endif %}
@@ -387,134 +389,136 @@
   <div class="left-pane">
     <form method="post" action="/config" id="config-form">
       <div class="card">
-        <h2>General Settings</h2>
+        <h2>{{ t('config.general.title') }}</h2>
         <div class="global-row">
-          <label>Dashboard Title</label>
+          <label>{{ t('config.general.language_label') }}</label>
+          <select name="language" style="background: #0d1117; border: 1px solid rgba(48, 54, 61, 0.8); border-radius: 6px; padding: 8px 12px; color: #e1e4e8; font-size: 13px; max-width: 240px; outline: none; cursor: pointer; transition: border-color 0.2s;">
+            <option value="auto" {% if configured_language == 'auto' or not configured_language %}selected{% endif %}>{{ t('config.general.language_auto') }}</option>
+            {% for item in available_languages %}
+            <option value="{{ item.code }}" {% if configured_language == item.code %}selected{% endif %}>{{ item.name }}</option>
+            {% endfor %}
+          </select>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.general.language_note') }}</span>
+        </div>
+        <div class="global-row">
+          <label>{{ t('config.general.dashboard_title') }}</label>
           <input type="text" name="title" value="{{ title }}">
         </div>
         <div class="global-row">
-          <label>Refresh Interval (seconds)</label>
+          <label>{{ t('config.general.refresh_interval') }}</label>
           <input type="number" name="refresh_interval" value="{{ refresh }}" min="1" max="300">
         </div>
         <div class="global-row">
-          <label>MAC Table Refresh Multiplier (x polling cycles)</label>
+          <label>{{ t('config.general.mac_multiplier') }}</label>
           <input type="number" name="mac_refresh_multiplier" value="{{ mac_multiplier }}" min="1" max="100" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">e.g., if set to 5, the MAC table is fetched every 5 dashboard refreshes to reduce switch load.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.general.mac_multiplier_note') }}</span>
         </div>
         <div class="global-row">
-          <label>Nodes Per Row</label>
+          <label>{{ t('config.general.grid_columns') }}</label>
           <select name="grid_columns" style="background: #0d1117; border: 1px solid rgba(48, 54, 61, 0.8); border-radius: 6px; padding: 8px 12px; color: #e1e4e8; font-size: 13px; max-width: 180px; outline: none; cursor: pointer; transition: border-color 0.2s;">
-            <option value="auto" {% if grid_columns == 'auto' or not grid_columns %}selected{% endif %}>Auto (Responsive)</option>
+            <option value="auto" {% if grid_columns == 'auto' or not grid_columns %}selected{% endif %}>{{ t('config.general.grid_auto') }}</option>
             <option value="1" {% if grid_columns == '1' %}selected{% endif %}>1</option>
             <option value="2" {% if grid_columns == '2' %}selected{% endif %}>2</option>
             <option value="3" {% if grid_columns == '3' %}selected{% endif %}>3</option>
             <option value="4" {% if grid_columns == '4' %}selected{% endif %}>4</option>
           </select>
-          <span class="note" style="display:block; margin-top:2px;">Select how many nodes are displayed side-by-side on large screens.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.general.grid_columns_note') }}</span>
         </div>
         <div class="global-row">
-          <label>Ports Row Wrap Threshold</label>
+          <label>{{ t('config.general.ports_wrap') }}</label>
           <input type="number" name="ports_wrap_threshold" value="{{ ports_wrap_threshold }}" min="0" max="100" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">If a node has more ports than this threshold, the port graphic bar will wrap into multiple rows (useful for OVS switches with high port counts). Set to 0 to disable wrapping.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.general.ports_wrap_note') }}</span>
         </div>
         <div class="global-row">
-          <label>Max Request Retries</label>
+          <label>{{ t('config.general.max_retries') }}</label>
           <input type="number" name="max_request_retries" value="{{ max_request_retries }}" min="0" max="20" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">Number of times to retry failed HTTP requests to switches. Set to 0 to disable retries (only 1 attempt is made; highly recommended to prevent lag if switches return 404 or have pages disabled).</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.general.max_retries_note') }}</span>
         </div>
         <div class="global-row">
-          <label>Ignored MACs (comma-separated wildcards, e.g. FA:CE:*)</label>
-          <input type="text" name="ignored_macs" value="{{ ignored_macs }}" placeholder="e.g. FA:CE:*, 00:11:22:33:*">
-          <span class="note" style="display:block; margin-top:2px;">Specify MAC address patterns to completely exclude from the dashboard (clients, tables, maps). Support wildcards (e.g. FA:CE:*).</span>
+          <label>{{ t('config.general.ignored_macs') }}</label>
+          <input type="text" name="ignored_macs" value="{{ ignored_macs }}" placeholder="{{ t('config.general.ignored_macs_placeholder') }}">
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.general.ignored_macs_note') }}</span>
         </div>
       </div>
 
       <div class="card">
-        <h2>Subnet Discovery & Port Scanner Settings</h2>
-        <span class="note" style="display:block; margin-bottom:12px;">Configure active IP and TCP port scanning for local host discovery.</span>
+        <h2>{{ t('config.scanner_settings.title') }}</h2>
+        <span class="note" style="display:block; margin-bottom:12px;">{{ t('config.scanner_settings.desc') }}</span>
         
         <div class="global-row">
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="checkbox" name="scanner_enabled" value="true" {% if scanner_enabled %}checked{% endif %} style="width: auto;">
-            Enable Subnet Discovery Scanner
+            {{ t('config.scanner_settings.enable_discovery') }}
           </label>
-          <span class="note" style="display:block; margin-top:2px;">If enabled, the dashboard performs active ARP discovery on the specified subnet.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.enable_discovery_note') }}</span>
         </div>
         
         <div class="global-row">
-          <label>Discovery Subnet Range (CIDR)</label>
-          <input type="text" name="scanner_network_range" value="{{ scanner_network_range }}" placeholder="e.g. 192.168.1.0/24">
-          <span class="note" style="display:block; margin-top:2px;">CIDR subnet to scan (e.g. 192.168.1.0/24).</span>
+          <label>{{ t('config.scanner_settings.subnet_range') }}</label>
+          <input type="text" name="scanner_network_range" value="{{ scanner_network_range }}" placeholder="{{ t('config.scanner_settings.subnet_range_placeholder') }}">
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.subnet_range_note') }}</span>
         </div>
         
         <div class="global-row">
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="checkbox" name="scanner_port_scan_enabled" value="true" {% if scanner_port_scan_enabled %}checked{% endif %} style="width: auto;">
-            Enable Port Scanner
+            {{ t('config.scanner_settings.enable_port_scan') }}
           </label>
-          <span class="note" style="display:block; margin-top:2px;">If enabled, the scanner will check for open TCP ports on discovered active hosts.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.enable_port_scan_note') }}</span>
         </div>
         
         <div class="global-row">
-          <label>TCP Ports to Scan (comma-separated or ranges)</label>
-          <input type="text" name="scanner_port_scan_range" value="{{ scanner_port_scan_range }}" placeholder="e.g. 22,80,443,8080">
-          <span class="note" style="display:block; margin-top:2px;">Ports or ranges to check (e.g., '22,80,443,1000-2000').</span>
+          <label>{{ t('config.scanner_settings.ports_range') }}</label>
+          <input type="text" name="scanner_port_scan_range" value="{{ scanner_port_scan_range }}" placeholder="{{ t('config.scanner_settings.ports_range_placeholder') }}">
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.ports_range_note') }}</span>
         </div>
         
         <div class="global-row">
-          <label>Scan Interval (seconds)</label>
+          <label>{{ t('config.scanner_settings.scan_interval') }}</label>
           <input type="number" name="scanner_interval" value="{{ scanner_interval }}" min="10" max="86400" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">Main subnet discovery interval.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.scan_interval_note') }}</span>
         </div>
         
         <div class="global-row">
-          <label>Port Scan Interval (seconds)</label>
+          <label>{{ t('config.scanner_settings.port_scan_interval') }}</label>
           <input type="number" name="scanner_port_scan_interval" value="{{ scanner_port_scan_interval }}" min="30" max="86400" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">TCP port scan execution interval.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.port_scan_interval_note') }}</span>
         </div>
         
         <div class="global-row">
-          <label>Purge Connection History (hours)</label>
+          <label>{{ t('config.scanner_settings.purge_hours') }}</label>
           <input type="number" name="scanner_purge_history_hours" value="{{ scanner_purge_history_hours }}" min="0" max="87600" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">Delete connection status history logs older than this threshold. Set to 0 to disable purging.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.purge_hours_note') }}</span>
         </div>
 
         <div class="global-row">
-          <label>Host Scan Concurrency (Parallel Hosts)</label>
+          <label>{{ t('config.scanner_settings.host_threads') }}</label>
           <input type="number" name="scanner_host_scan_threads" value="{{ scanner_host_scan_threads }}" min="1" max="50" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">Number of hosts to scan for open ports in parallel.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.host_threads_note') }}</span>
         </div>
 
         <div class="global-row">
-          <label>Port Scan Concurrency (Parallel Ports per Host)</label>
+          <label>{{ t('config.scanner_settings.port_threads') }}</label>
           <input type="number" name="scanner_port_scan_threads" value="{{ scanner_port_scan_threads }}" min="1" max="100" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">Number of TCP ports to scan in parallel per individual host.</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.port_threads_note') }}</span>
         </div>
 
         <div class="global-row">
-          <label>Port Scan Timeout (milliseconds)</label>
+          <label>{{ t('config.scanner_settings.timeout_ms') }}</label>
           <input type="number" name="scanner_port_scan_timeout_ms" value="{{ scanner_port_scan_timeout_ms }}" min="10" max="5000" style="max-width:120px">
-          <span class="note" style="display:block; margin-top:2px;">Timeout in milliseconds for TCP port connection attempts (default: 500 ms).</span>
+          <span class="note" style="display:block; margin-top:2px;">{{ t('config.scanner_settings.timeout_ms_note') }}</span>
         </div>
       </div>
 
       <div class="card">
-        <h2>Column Visibility Settings</h2>
+        <h2>{{ t('config.columns_settings.title') }}</h2>
         <div class="global-row" style="margin-bottom: 0;">
-          <span class="note" style="display:block; margin-bottom: 12px;">Select which columns are visible in the node port tables on the dashboard.</span>
+          <span class="note" style="display:block; margin-bottom: 12px;">{{ t('config.columns_settings.desc') }}</span>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 8px;">
-            {% for col_id, col_label in [
-              ('port', 'Port'),
-              ('status', 'Status'),
-              ('speed', 'Speed'),
-              ('packets', 'Traffic (packets)'),
-              ('bytes', 'Traffic (bytes)'),
-              ('info', 'BPS / B/s'),
-              ('notes', 'Notes')
-            ] %}
+            {% for col_id in ['port', 'status', 'speed', 'packets', 'bytes', 'info', 'notes'] %}
             <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #b1bac4; font-weight: 500; cursor: pointer; user-select: none; padding: 6px 0;">
               <input type="checkbox" name="columns[]" value="{{ col_id }}" {% if col_id in enabled_columns %}checked{% endif %} style="accent-color: #58a6ff; width: 15px; height: 15px; cursor: pointer;">
-              {{ col_label }}
+              {{ t('config.columns_settings.' + col_id) }}
             </label>
             {% endfor %}
           </div>
@@ -522,7 +526,7 @@
       </div>
 
       <div class="card">
-        <h2>Nodes</h2>
+        <h2>{{ t('config.nodes.title') }}</h2>
         <div id="switch-list">
           {% for sw in switches %}
           <div class="switch-group" data-index="{{ loop.index0 }}">
@@ -531,53 +535,53 @@
               <div class="switch-title-wrap">
                 <span class="drag-handle" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">⠿</span>
                 <svg class="switch-chevron" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                <h3>Node {{ loop.index }} <span class="switch-subname" id="subname-{{ loop.index0 }}">{{ sw.name }} ({{ sw.ip }})</span></h3>
+                <h3>{{ t('config.nodes.node_title', index=loop.index) }} <span class="switch-subname" id="subname-{{ loop.index0 }}">{{ sw.name }} ({{ sw.ip }})</span></h3>
               </div>
               <div class="switch-actions" onclick="event.stopPropagation()">
-                <button type="button" class="inline-reboot-btn" onclick="openRebootModal('{{ sw.ip }}', '{{ sw.name }}')">Reboot</button>
-                <button type="button" class="inline-remove-btn" onclick="removeSwitch(this)">Delete</button>
+                <button type="button" class="inline-reboot-btn" onclick="openRebootModal('{{ sw.ip }}', '{{ sw.name }}')">{{ t('config.nodes.reboot') }}</button>
+                <button type="button" class="inline-remove-btn" onclick="removeSwitch(this)">{{ t('config.nodes.delete') }}</button>
               </div>
             </div>
             <div class="switch-content">
               <div class="form-row">
-                <label>Name</label>
-                <input type="text" name="name[]" value="{{ sw.name }}" placeholder="Node 1" oninput="updateSubname({{ loop.index0 }}, this.value, null)">
+                <label>{{ t('config.nodes.name') }}</label>
+                <input type="text" name="name[]" value="{{ sw.name }}" placeholder="{{ t('config.nodes.name_placeholder', index=1) }}" oninput="updateSubname({{ loop.index0 }}, this.value, null)">
               </div>
               <div class="form-row">
-                <label>IP Address</label>
-                <input type="text" name="ip[]" value="{{ sw.ip }}" placeholder="192.168.1.100" oninput="updateSubname({{ loop.index0 }}, null, this.value)">
+                <label>{{ t('config.nodes.ip') }}</label>
+                <input type="text" name="ip[]" value="{{ sw.ip }}" placeholder="{{ t('config.nodes.ip_placeholder') }}" oninput="updateSubname({{ loop.index0 }}, null, this.value)">
               </div>
               <div class="form-row">
-                <label>Username</label>
+                <label>{{ t('config.nodes.username') }}</label>
                 <input type="text" name="username[]" value="{{ sw.username }}" placeholder="admin">
               </div>
               <div class="form-row">
-                <label>Password</label>
+                <label>{{ t('config.nodes.password') }}</label>
                 <input type="password" name="password[]" value="{{ sw.password }}" placeholder="admin">
               </div>
               <div class="form-row">
-                <label>Model</label>
+                <label>{{ t('config.nodes.model') }}</label>
                 <input type="text" name="model[]" value="{{ sw.get('model', '') }}" placeholder="HC-SWTGW218AS">
-                <span class="note">Optional (e.g. HC-SWTGW218AS, fritzbox, openvswitch, or internet)</span>
+                <span class="note">{{ t('config.nodes.model_note') }}</span>
               </div>
               <div class="form-row">
-                <label>Port Count</label>
+                <label>{{ t('config.nodes.port_count') }}</label>
                 <input type="number" name="port_count[]" value="{{ sw.get('port_count', 9) }}" min="1" max="52" style="max-width:80px">
               </div>
               <div class="form-row" style="border-top: 1px solid rgba(48, 54, 61, 0.4); padding-top: 12px; margin-top: 12px;">
-                <label style="color: #58a6ff;">Parent Device IP</label>
-                <input type="text" name="parent_ip[]" value="{{ sw.get('parent_ip', '') }}" placeholder="e.g. 192.168.1.1 (Fritz!Box)">
-                <span class="note">IP of the upstream parent node this node connects to.</span>
+                <label style="color: #58a6ff;">{{ t('config.nodes.parent_ip') }}</label>
+                <input type="text" name="parent_ip[]" value="{{ sw.get('parent_ip', '') }}" placeholder="{{ t('config.nodes.parent_ip_placeholder') }}">
+                <span class="note">{{ t('config.nodes.parent_ip_note') }}</span>
               </div>
               <div class="form-row">
-                <label style="color: #58a6ff;">Parent Port</label>
-                <input type="text" name="parent_port[]" value="{{ sw.get('parent_port', '') }}" placeholder="e.g. LAN 2 or 8">
-                <span class="note">The port on the parent device that connects to this node.</span>
+                <label style="color: #58a6ff;">{{ t('config.nodes.parent_port') }}</label>
+                <input type="text" name="parent_port[]" value="{{ sw.get('parent_port', '') }}" placeholder="{{ t('config.nodes.parent_port_placeholder') }}">
+                <span class="note">{{ t('config.nodes.parent_port_note') }}</span>
               </div>
               <div class="form-row" style="margin-bottom: 18px;">
-                <label style="color: #58a6ff;">Local Uplink Port</label>
-                <input type="text" name="uplink_port[]" value="{{ sw.get('uplink_port', '') }}" placeholder="e.g. Port 1 or 1">
-                <span class="note">The port on this node itself that connects to the parent.</span>
+                <label style="color: #58a6ff;">{{ t('config.nodes.uplink_port') }}</label>
+                <input type="text" name="uplink_port[]" value="{{ sw.get('uplink_port', '') }}" placeholder="{{ t('config.nodes.uplink_port_placeholder') }}">
+                <span class="note">{{ t('config.nodes.uplink_port_note') }}</span>
               </div>
               <div class="form-row" style="display: flex; align-items: center; gap: 8px;">
                 <input type="hidden" name="switch_enabled[]" id="switch_enabled_hidden_{{ loop.index0 }}" value="{% if sw.get('enabled', True) %}1{% else %}0{% endif %}">
@@ -585,89 +589,89 @@
                   <input type="checkbox" {% if sw.get('enabled', True) %}checked{% endif %} onchange="document.getElementById('switch_enabled_hidden_{{ loop.index0 }}').value = this.checked ? '1' : '0'">
                   <span class="slider round"></span>
                 </label>
-                <span style="font-size: 13px; color: #e1e4e8;">Enabled (Query and display this node)</span>
+                <span style="font-size: 13px; color: #e1e4e8;">{{ t('config.nodes.enabled') }}</span>
               </div>
             </div>
           </div>
           {% endfor %}
         </div>
 
-        <button type="button" class="add-btn" onclick="addSwitch()">+ Add Node</button>
+        <button type="button" class="add-btn" onclick="addSwitch()">{{ t('config.nodes.add_node') }}</button>
       </div>
 
       <div class="card">
         <h2>
-          <span>🖥️ Infrastructure Devices</span>
+          <span>🖥️ {{ t('config.infra.title') }}</span>
         </h2>
         <span class="note" style="display:block; margin-bottom: 12px;">
-          Define key network infrastructure nodes (e.g., Router/WiFi, Access Points, Repeaters). These MAC addresses are used to correctly root the network map and group client devices.
+          {{ t('config.infra.desc') }}
         </span>
         <div id="infra-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
           {% for dev in infrastructure_devices %}
           <div class="form-row infra-item" style="border: 1px solid rgba(48, 54, 61, 0.4); padding: 12px; border-radius: 8px; background: rgba(22, 27, 34, 0.4);" data-index="{{ loop.index0 }}">
             <input type="hidden" name="infra_keep[]" value="1">
             <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap; align-items: center;">
-              <input type="text" name="infra_name[]" value="{{ dev.name }}" placeholder="Device Name (e.g. Router)" style="flex: 2; min-width: 150px;">
-              <input type="text" name="infra_mac[]" value="{{ dev.mac }}" placeholder="MAC Address (e.g. AA:BB:CC:...)" style="flex: 2; min-width: 150px;">
+              <input type="text" name="infra_name[]" value="{{ dev.name }}" placeholder="{{ t('config.infra.name_placeholder') }}" style="flex: 2; min-width: 150px;">
+              <input type="text" name="infra_mac[]" value="{{ dev.mac }}" placeholder="{{ t('config.infra.mac_placeholder') }}" style="flex: 2; min-width: 150px;">
               <select name="infra_type[]" style="background: #0d1117; border: 1px solid rgba(48, 54, 61, 0.8); border-radius: 6px; padding: 8px 12px; color: #e1e4e8; font-size: 13px; flex: 1.5; min-width: 110px; outline: none; cursor: pointer;">
-                <option value="router" {% if dev.type == 'router' %}selected{% endif %}>Router/Gateway</option>
-                <option value="repeater" {% if dev.type == 'repeater' %}selected{% endif %}>Repeater/AP</option>
-                <option value="other" {% if dev.type == 'other' %}selected{% endif %}>Other Infra</option>
+                <option value="router" {% if dev.type == 'router' %}selected{% endif %}>{{ t('config.infra.type_router') }}</option>
+                <option value="repeater" {% if dev.type == 'repeater' %}selected{% endif %}>{{ t('config.infra.type_repeater') }}</option>
+                <option value="other" {% if dev.type == 'other' %}selected{% endif %}>{{ t('config.infra.type_other') }}</option>
               </select>
-              <button type="button" class="inline-remove-btn" onclick="removeInfra(this)" style="margin-left: auto;">Delete</button>
+              <button type="button" class="inline-remove-btn" onclick="removeInfra(this)" style="margin-left: auto;">{{ t('common.delete') }}</button>
             </div>
           </div>
           {% endfor %}
         </div>
-        <button type="button" class="add-btn" onclick="addInfra()">+ Add Infrastructure Device</button>
+        <button type="button" class="add-btn" onclick="addInfra()">{{ t('config.infra.add') }}</button>
       </div>
 
       <div class="card">
         <h2>
-          <span>🔌 Unmanaged Switches</span>
+          <span>🔌 {{ t('config.unmanaged.title') }}</span>
         </h2>
         <span class="note" style="display:block; margin-bottom: 12px;">
-          Define unmanaged switches connected to a specific managed switch port. All devices learned on that parent port will be grouped under this unmanaged switch.
+          {{ t('config.unmanaged.desc') }}
         </span>
         <div id="unmanaged-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
           {% for us in unmanaged_switches %}
           <div class="form-row unmanaged-item" style="border: 1px solid rgba(48, 54, 61, 0.4); padding: 12px; border-radius: 8px; background: rgba(22, 27, 34, 0.4);" data-index="{{ loop.index0 }}">
             <input type="hidden" name="unmanaged_keep[]" value="1">
             <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap; align-items: center;">
-              <input type="text" name="unmanaged_name[]" value="{{ us.name }}" placeholder="Switch Name (e.g. Desk Switch)" style="flex: 2; min-width: 150px;">
+              <input type="text" name="unmanaged_name[]" value="{{ us.name }}" placeholder="{{ t('config.unmanaged.name_placeholder') }}" style="flex: 2; min-width: 150px;">
               <select name="unmanaged_parent_ip[]" style="background: #0d1117; border: 1px solid rgba(48, 54, 61, 0.8); border-radius: 6px; padding: 8px 12px; color: #e1e4e8; font-size: 13px; flex: 2; min-width: 150px; outline: none; cursor: pointer;">
                 {% for sw in switches if sw.get('model', '').lower() != 'internet' %}
                 <option value="{{ sw.ip }}" {% if us.parent_ip == sw.ip %}selected{% endif %}>{{ sw.name }} ({{ sw.ip }})</option>
                 {% endfor %}
               </select>
-              <input type="number" name="unmanaged_parent_port[]" value="{{ us.parent_port }}" placeholder="Port (e.g. 2)" min="1" max="52" style="flex: 1; min-width: 80px;">
-              <button type="button" class="inline-remove-btn" onclick="removeUnmanaged(this)" style="margin-left: auto;">Delete</button>
+              <input type="number" name="unmanaged_parent_port[]" value="{{ us.parent_port }}" placeholder="{{ t('config.unmanaged.port_placeholder') }}" min="1" max="52" style="flex: 1; min-width: 80px;">
+              <button type="button" class="inline-remove-btn" onclick="removeUnmanaged(this)" style="margin-left: auto;">{{ t('common.delete') }}</button>
             </div>
           </div>
           {% endfor %}
         </div>
-        <button type="button" class="add-btn" onclick="addUnmanaged()">+ Add Unmanaged Switch</button>
+        <button type="button" class="add-btn" onclick="addUnmanaged()">{{ t('config.unmanaged.add') }}</button>
       </div>
 
       <div class="card">
-        <h2>📡 Telemetry Settings</h2>
+        <h2>📡 {{ t('config.telemetry.title') }}</h2>
         <span class="note" style="display:block; margin-bottom: 12px; line-height: 1.5;">
-          Help improve this project! Enabling anonymous telemetry is active by default.
+          {{ t('config.telemetry.desc_line1') }}
           <br>
-          <strong style="color: #ff7b72;">No sensitive data</strong> (such as MAC addresses, usernames, passwords, or hostnames) will ever be collected—only anonymous statistics.
+          {{ t('config.telemetry.desc_line2_html')|safe }}
           <br>
-          Telemetry costs you nothing, but it helps me improve the project.
+          {{ t('config.telemetry.desc_line3') }}
         </span>
         <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #b1bac4; font-weight: 500; cursor: pointer; user-select: none; padding: 6px 0;">
           <input type="checkbox" name="telemetry_enabled" value="true" {% if telemetry_enabled %}checked{% endif %} style="accent-color: #58a6ff; width: 15px; height: 15px; cursor: pointer;">
-          Enable Anonymous Telemetry (recommended)
+          {{ t('config.telemetry.enable') }}
         </label>
       </div>
 
       <div class="card">
         <div class="btn-row">
-          <input type="submit" value="Save Configuration">
-          <a href="/">Cancel</a>
+          <input type="submit" value="{{ t('config.save_configuration') }}">
+          <a href="/">{{ t('common.cancel') }}</a>
         </div>
       </div>
     </form>
@@ -677,23 +681,23 @@
   <div class="right-pane">
     <div class="card">
       <h2>
-        <span>🔌 YAML Device Templates</span>
-        <span class="version-badge" style="background: rgba(88,166,255,0.15); color: #58a6ff;">Editor</span>
+        <span>🔌 {{ t('config.templates.title') }}</span>
+        <span class="version-badge" style="background: rgba(88,166,255,0.15); color: #58a6ff;">{{ t('config.templates.badge') }}</span>
       </h2>
       <div class="yaml-feedback" id="yaml-feedback"></div>
       
       <div class="template-select-row">
         <select class="template-select" id="template-select" onchange="loadSelectedTemplate()">
-          <option value="" disabled selected>Select a Template...</option>
+          <option value="" disabled selected>{{ t('config.templates.select_placeholder') }}</option>
         </select>
-        <button type="button" class="btn-new-tpl" onclick="createNewTemplate()">New Template</button>
+        <button type="button" class="btn-new-tpl" onclick="createNewTemplate()">{{ t('config.templates.new_btn') }}</button>
       </div>
       
       <div class="editor-wrapper">
-        <textarea class="editor-textarea" id="editor-textarea" spellcheck="false" placeholder="# Select or create a template to begin editing..." disabled oninput="onEditorChange()"></textarea>
+        <textarea class="editor-textarea" id="editor-textarea" spellcheck="false" placeholder="{{ t('config.templates.textarea_placeholder') }}" disabled oninput="onEditorChange()"></textarea>
         <div class="editor-status-bar">
-          <span id="editor-char-count">0 characters</span>
-          <span id="editor-syntax-status">Empty</span>
+          <span id="editor-char-count">{{ t('common.characters_count', count=0) }}</span>
+          <span id="editor-syntax-status">{{ t('config.templates.empty_status') }}</span>
         </div>
       </div>
       
@@ -701,27 +705,27 @@
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
           <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
         </svg>
-        Save Template
+        {{ t('config.templates.save_btn') }}
       </button>
     </div>
 
     <!-- NEW CARD: Custom MAC Vendors Editor -->
     <div class="card" id="vendor-editor-card" style="margin-top: 20px;">
       <h2>
-        <span>📁 Custom MAC Vendors</span>
+        <span>📁 {{ t('config.vendors.title') }}</span>
         <span class="version-badge" style="background: rgba(63,185,80,0.15); color: #3fb950;">mac_vendors.txt</span>
       </h2>
       <div class="yaml-feedback" id="vendor-feedback"></div>
       
       <span class="note" style="display:block; margin-bottom: 12px;">
-        Edit custom OUI prefixes. Format: <code>AA:BB:CC Vendor Name</code>, one per line. If a MAC address starts with these 3 bytes, the specified vendor name will be displayed.
+        {{ t('config.vendors.note_html')|safe }}
       </span>
 
       <div class="editor-wrapper">
-        <textarea class="editor-textarea" id="vendor-textarea" spellcheck="false" placeholder="# Enter MAC vendor mappings (e.g. AA:BB:CC My Device)..." oninput="onVendorChange()" style="height: 250px;"></textarea>
+        <textarea class="editor-textarea" id="vendor-textarea" spellcheck="false" placeholder="{{ t('config.vendors.placeholder') }}" oninput="onVendorChange()" style="height: 250px;"></textarea>
         <div class="editor-status-bar">
-          <span id="vendor-char-count">0 characters</span>
-          <span id="vendor-syntax-status">Ready</span>
+          <span id="vendor-char-count">{{ t('common.characters_count', count=0) }}</span>
+          <span id="vendor-syntax-status">{{ t('config.vendors.ready') }}</span>
         </div>
       </div>
       
@@ -729,28 +733,27 @@
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
           <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
         </svg>
-        Save MAC Vendors
+        {{ t('config.vendors.save_btn') }}
       </button>
     </div>
 
     <!-- NEW CARD: Custom Client Device Types Editor -->
     <div class="card" id="device-types-editor-card" style="margin-top: 20px;">
       <h2>
-        <span>📱 Custom Client Device Types</span>
+        <span>📱 {{ t('config.device_types.title') }}</span>
         <span class="version-badge" style="background: rgba(168,85,247,0.15); color: #a855f7;">device_types.yaml</span>
       </h2>
       <div class="yaml-feedback" id="device-types-feedback"></div>
       
       <span class="note" style="display:block; margin-bottom: 12px;">
-        Edit custom client device types and their Material Design SVG path icons.
-        Format: Key mapping, with <code>label</code> and <code>path</code> (SVG path only).
+        {{ t('config.device_types.note_html')|safe }}
       </span>
 
       <div class="editor-wrapper">
-        <textarea class="editor-textarea" id="device-types-textarea" spellcheck="false" placeholder="# Custom device types YAML..." oninput="onDeviceTypesChange()" style="height: 300px; font-family: monospace;"></textarea>
+        <textarea class="editor-textarea" id="device-types-textarea" spellcheck="false" placeholder="{{ t('config.device_types.placeholder') }}" oninput="onDeviceTypesChange()" style="height: 300px; font-family: monospace;"></textarea>
         <div class="editor-status-bar">
-          <span id="device-types-char-count">0 characters</span>
-          <span id="device-types-syntax-status">Ready</span>
+          <span id="device-types-char-count">{{ t('common.characters_count', count=0) }}</span>
+          <span id="device-types-syntax-status">{{ t('config.device_types.ready') }}</span>
         </div>
       </div>
       
@@ -758,15 +761,15 @@
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
           <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
         </svg>
-        Save Device Types
+        {{ t('config.device_types.save_btn') }}
       </button>
     </div>
 
     <!-- NEW CARD: IEEE OUI Update -->
     <div class="card" id="oui-update-card" style="margin-top: 20px;">
       <h2>
-        <span>🌐 IEEE OUI Database</span>
-        <span class="version-badge" style="background: rgba(88, 166, 255, 0.15); color: #58a6ff;">IEEE Registry</span>
+        <span>🌐 {{ t('config.oui.title') }}</span>
+        <span class="version-badge" style="background: rgba(88, 166, 255, 0.15); color: #58a6ff;">{{ t('config.oui.badge') }}</span>
       </h2>
       <div class="yaml-feedback" id="oui-feedback"></div>
       
@@ -777,57 +780,56 @@
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
           </svg>
           <div style="font-size: 12px; line-height: 1.5; color: #f0883e;">
-            <strong>Warning:</strong> Due to excessively high volume suspicious queries to the IEEE Registration Authority Assignments Downloads server(s), a number of addresses are being blocked. Users are reminded that IEEE RA assignment downloads are limited to <strong>one per day</strong>. If your access is blocked please contact IEEE Registration Authority <a href="mailto:ieee-registration-authority@ieee.org" style="color: #58a6ff; text-decoration: underline;">ieee-registration-authority@ieee.org</a> to resolve the issue.
+            {{ t('config.oui.warning_html')|safe }}
           </div>
         </div>
       </div>
 
       <span class="note" style="display:block; margin-bottom: 16px;">
-        Download the latest IEEE OUI databases (<code>oui.txt</code> and <code>oui36.txt</code>) directly from IEEE standards servers to automatically resolve official MAC address manufacturers.
+        {{ t('config.oui.note_html')|safe }}
       </span>
 
       <button type="button" class="yaml-save-btn" id="oui-update-btn" onclick="updateIeeeOui()" style="background: #1f6feb; box-shadow: 0 4px 12px rgba(31, 111, 235, 0.25);">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
           <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
         </svg>
-        Update IEEE OUI Database
+        {{ t('config.oui.update_btn') }}
       </button>
     </div>
 
     <!-- NEW CARD: CSV Import -->
     <div class="card" id="csv-import-card" style="margin-top: 20px;">
       <h2>
-        <span>📋 Import Client Hostnames</span>
-        <span class="version-badge" style="background: rgba(88, 166, 255, 0.15); color: #58a6ff;">CSV Import</span>
+        <span>📋 {{ t('config.csv.title') }}</span>
+        <span class="version-badge" style="background: rgba(88, 166, 255, 0.15); color: #58a6ff;">{{ t('config.csv.badge') }}</span>
       </h2>
       <div class="yaml-feedback" id="csv-feedback"></div>
       
       <span class="note" style="display:block; margin-bottom: 12px;">
-        Upload a CSV file containing client hostnames and MAC addresses to import them.
-        Format: <code>Host name,MAC Address,IP Address</code> (one per line, comma-separated, header line is optional).
+        {{ t('config.csv.note_html')|safe }}
       </span>
 
       <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
         <input type="file" id="csv-file-input" accept=".csv" style="display: none;" onchange="updateCsvFileName(this)">
         <button type="button" class="yaml-save-btn" onclick="document.getElementById('csv-file-input').click()" style="background: #21262d; border: 1px solid #30363d; margin: 0; width: auto;">
-          Choose CSV File...
+          {{ t('config.csv.choose_file') }}
         </button>
-        <span id="csv-file-name" style="font-size: 13px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;">No file chosen</span>
+        <span id="csv-file-name" style="font-size: 13px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;">{{ t('config.csv.no_file') }}</span>
       </div>
 
       <button type="button" class="yaml-save-btn" id="csv-import-btn" onclick="importCsvFile()" style="background: #238636; box-shadow: 0 4px 12px rgba(35, 134, 54, 0.25); margin-top: 15px;">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
           <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
         </svg>
-        Upload and Import
+        {{ t('config.csv.upload_btn') }}
       </button>
     </div>
   </div>
 </div>
 
 <div class="footer">
-  <div><a href="/" style="color:#8b949e">Back to Dashboard</a> &middot; <a href="/api-docs" style="color:#8b949e">API Reference</a> &middot; <span class="version-badge">v{{ version }}</span></div>
-  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+  <div><a href="/" style="color:#8b949e">{{ t('nav.back_to_dashboard') }}</a> &middot; <a href="/api-docs" style="color:#8b949e">{{ t('nav.api_reference') }}</a> &middot; <span class="version-badge">v{{ version }}</span></div>
+  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
 </div>
 
 <!-- Reboot Confirmation Modal -->
@@ -837,25 +839,25 @@
       <svg viewBox="0 0 24 24" width="22" height="22" style="flex-shrink:0;">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#f0883e"/>
       </svg>
-      <h3>Reboot Device</h3>
+      <h3>{{ t('config.reboot_modal.title') }}</h3>
     </div>
     <div class="modal-body">
-      <p>Rebooting <strong id="reboot-switch-name">Switch</strong> (<span id="reboot-switch-ip">192.168.1.x</span>) will temporarily interrupt the local network connection.</p>
-      <p class="modal-warning">Confirm to proceed with reboot.</p>
+      <p>{{ t('config.reboot_modal.desc_html')|safe }}</p>
+      <p class="modal-warning">{{ t('config.reboot_modal.warning') }}</p>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn-cancel" onclick="closeRebootModal()">Cancel</button>
-      <button type="button" class="btn-confirm" onclick="executeReboot()">Confirm Reboot</button>
+      <button type="button" class="btn-cancel" onclick="closeRebootModal()">{{ t('common.cancel') }}</button>
+      <button type="button" class="btn-confirm" onclick="executeReboot()">{{ t('config.reboot_modal.confirm') }}</button>
     </div>
     <div id="reboot-loading" class="reboot-loading" style="display:none;">
       <div class="spinner"></div>
-      <p>Sending reboot command...</p>
+      <p>{{ t('config.reboot_modal.sending') }}</p>
     </div>
     <div id="reboot-success" class="reboot-status" style="display:none; color: #3fb950;">
-      <span style="font-size: 24px; margin-bottom: 8px;">✓</span> Reboot command sent. Redirecting...
+      <span style="font-size: 24px; margin-bottom: 8px;">✓</span> {{ t('config.reboot_modal.sent') }}
     </div>
     <div id="reboot-error" class="reboot-status" style="display:none; color: #f85149;">
-      <span style="font-size: 24px; margin-bottom: 8px;">✗</span> Failed: <span id="reboot-error-msg" style="font-size: 13px; font-weight: normal; margin-top: 4px;"></span>
+      <span style="font-size: 24px; margin-bottom: 8px;">✗</span> {{ t('config.reboot_modal.failed') }} <span id="reboot-error-msg" style="font-size: 13px; font-weight: normal; margin-top: 4px;"></span>
     </div>
   </div>
 </div>
@@ -867,7 +869,7 @@ function updateCsvFileName(input) {
   if (input.files && input.files.length > 0) {
     fileNameSpan.textContent = input.files[0].name;
   } else {
-    fileNameSpan.textContent = 'No file chosen';
+    fileNameSpan.textContent = t('config.csv.no_file');
   }
 }
 
@@ -878,7 +880,7 @@ async function importCsvFile() {
   
   if (!fileInput.files || fileInput.files.length === 0) {
     feedback.className = 'yaml-feedback error';
-    feedback.textContent = 'Error: Please choose a CSV file to upload.';
+    feedback.textContent = t('config.csv.error_choose_file');
     feedback.style.display = 'block';
     return;
   }
@@ -889,7 +891,7 @@ async function importCsvFile() {
   
   importBtn.disabled = true;
   feedback.className = 'yaml-feedback';
-  feedback.textContent = 'Uploading and processing CSV...';
+  feedback.textContent = t('config.csv.uploading');
   feedback.style.display = 'block';
   feedback.style.color = '#58a6ff';
   
@@ -902,18 +904,18 @@ async function importCsvFile() {
     
     if (response.ok) {
       feedback.className = 'yaml-feedback success';
-      feedback.textContent = `Success: Successfully imported ${result.imported} client hostnames.`;
+      feedback.textContent = t('config.csv.imported_success', { count: result.imported });
       feedback.style.color = '#3fb950';
       fileInput.value = '';
-      document.getElementById('csv-file-name').textContent = 'No file chosen';
+      document.getElementById('csv-file-name').textContent = t('config.csv.no_file');
     } else {
       feedback.className = 'yaml-feedback error';
-      feedback.textContent = `Error: ${result.error || 'Failed to import CSV'}`;
+      feedback.textContent = t('common.error_prefix', { message: result.error || t('config.csv.import_failed') });
       feedback.style.color = '#f85149';
     }
   } catch (e) {
     feedback.className = 'yaml-feedback error';
-    feedback.textContent = `Error: ${e.message}`;
+    feedback.textContent = t('common.error_prefix', { message: e.message });
     feedback.style.color = '#f85149';
   } finally {
     importBtn.disabled = false;
@@ -987,52 +989,52 @@ function addSwitch() {
       <div class="switch-title-wrap">
         <span class="drag-handle" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">⠿</span>
         <svg class="switch-chevron" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-        <h3>Node ${count + 1} <span class="switch-subname" id="subname-${count}">New Node</span></h3>
+        <h3>${t('config.nodes.node_title', { index: count + 1 })} <span class="switch-subname" id="subname-${count}">${t('config.nodes.new_node')}</span></h3>
       </div>
       <div class="switch-actions" onclick="event.stopPropagation()">
-        <button type="button" class="inline-remove-btn" onclick="removeSwitch(this)">Delete</button>
+        <button type="button" class="inline-remove-btn" onclick="removeSwitch(this)">${t('config.nodes.delete')}</button>
       </div>
     </div>
     <div class="switch-content active">
       <div class="form-row">
-        <label>Name</label>
-        <input type="text" name="name[]" value="Node ${count + 1}" placeholder="Node ${count + 1}" oninput="updateSubname(${count}, this.value, null)">
+        <label>${t('config.nodes.name')}</label>
+        <input type="text" name="name[]" value="${t('config.nodes.node_title', { index: count + 1 })}" placeholder="${t('config.nodes.name_placeholder', { index: count + 1 })}" oninput="updateSubname(${count}, this.value, null)">
       </div>
       <div class="form-row">
-        <label>IP Address</label>
+        <label>${t('config.nodes.ip')}</label>
         <input type="text" name="ip[]" value="" placeholder="192.168.1.x" oninput="updateSubname(${count}, null, this.value)">
       </div>
       <div class="form-row">
-        <label>Username</label>
+        <label>${t('config.nodes.username')}</label>
         <input type="text" name="username[]" value="admin" placeholder="admin">
       </div>
       <div class="form-row">
-        <label>Password</label>
+        <label>${t('config.nodes.password')}</label>
         <input type="password" name="password[]" value="admin" placeholder="password">
       </div>
       <div class="form-row">
-        <label>Model</label>
+        <label>${t('config.nodes.model')}</label>
         <input type="text" name="model[]" value="" placeholder="HC-SWTGW218AS">
-        <span class="note">Optional (e.g. HC-SWTGW218AS, fritzbox, openvswitch, or internet)</span>
+        <span class="note">${t('config.nodes.model_note')}</span>
       </div>
       <div class="form-row">
-        <label>Port Count</label>
+        <label>${t('config.nodes.port_count')}</label>
         <input type="number" name="port_count[]" value="9" min="1" max="52" style="max-width:80px">
       </div>
       <div class="form-row" style="border-top: 1px solid rgba(48, 54, 61, 0.4); padding-top: 12px; margin-top: 12px;">
-        <label style="color: #58a6ff;">Parent Device IP</label>
-        <input type="text" name="parent_ip[]" value="" placeholder="e.g. 192.168.1.1 (Fritz!Box)">
-        <span class="note">IP of the upstream parent node this node connects to.</span>
+        <label style="color: #58a6ff;">${t('config.nodes.parent_ip')}</label>
+        <input type="text" name="parent_ip[]" value="" placeholder="${t('config.nodes.parent_ip_placeholder')}">
+        <span class="note">${t('config.nodes.parent_ip_note')}</span>
       </div>
       <div class="form-row">
-        <label style="color: #58a6ff;">Parent Port</label>
-        <input type="text" name="parent_port[]" value="" placeholder="e.g. LAN 2 or 8">
-        <span class="note">The port on the parent device that connects to this node.</span>
+        <label style="color: #58a6ff;">${t('config.nodes.parent_port')}</label>
+        <input type="text" name="parent_port[]" value="" placeholder="${t('config.nodes.parent_port_placeholder')}">
+        <span class="note">${t('config.nodes.parent_port_note')}</span>
       </div>
       <div class="form-row" style="margin-bottom: 18px;">
-        <label style="color: #58a6ff;">Local Uplink Port</label>
-        <input type="text" name="uplink_port[]" value="" placeholder="e.g. Port 1 or 1">
-        <span class="note">The port on this node itself that connects to the parent.</span>
+        <label style="color: #58a6ff;">${t('config.nodes.uplink_port')}</label>
+        <input type="text" name="uplink_port[]" value="" placeholder="${t('config.nodes.uplink_port_placeholder')}">
+        <span class="note">${t('config.nodes.uplink_port_note')}</span>
       </div>
       <div class="form-row" style="display: flex; align-items: center; gap: 8px;">
         <input type="hidden" name="switch_enabled[]" id="switch_enabled_hidden_${count}" value="1">
@@ -1040,7 +1042,7 @@ function addSwitch() {
           <input type="checkbox" checked onchange="document.getElementById('switch_enabled_hidden_${count}').value = this.checked ? '1' : '0'">
           <span class="slider round"></span>
         </label>
-        <span style="font-size: 13px; color: #e1e4e8;">Enabled (Query and display this node)</span>
+        <span style="font-size: 13px; color: #e1e4e8;">${t('config.nodes.enabled')}</span>
       </div>
     </div>`;
   list.appendChild(div);
@@ -1072,7 +1074,7 @@ function renumber() {
     if (h3) {
       if (g.style.display !== 'none') {
         const text = subname ? subname.textContent : '';
-        h3.innerHTML = `Node ${activeIndex} <span class="switch-subname" id="subname-${i}">${text}</span>`;
+        h3.innerHTML = `${t('config.nodes.node_title', { index: activeIndex })} <span class="switch-subname" id="subname-${i}">${text}</span>`;
         activeIndex++;
       }
     }
@@ -1108,14 +1110,14 @@ function addInfra() {
   div.innerHTML = `
     <input type="hidden" name="infra_keep[]" value="1">
     <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap; align-items: center;">
-      <input type="text" name="infra_name[]" value="" placeholder="Device Name (e.g. Router)" style="flex: 2; min-width: 150px;">
-      <input type="text" name="infra_mac[]" value="" placeholder="MAC Address (e.g. AA:BB:CC:...)" style="flex: 2; min-width: 150px;">
+      <input type="text" name="infra_name[]" value="" placeholder="${t('config.infra.name_placeholder')}" style="flex: 2; min-width: 150px;">
+      <input type="text" name="infra_mac[]" value="" placeholder="${t('config.infra.mac_placeholder')}" style="flex: 2; min-width: 150px;">
       <select name="infra_type[]" style="background: #0d1117; border: 1px solid rgba(48, 54, 61, 0.8); border-radius: 6px; padding: 8px 12px; color: #e1e4e8; font-size: 13px; flex: 1.5; min-width: 110px; outline: none; cursor: pointer;">
-        <option value="router">Router/Gateway</option>
-        <option value="repeater">Repeater/AP</option>
-        <option value="other">Other Infra</option>
+        <option value="router">${t('config.infra.type_router')}</option>
+        <option value="repeater">${t('config.infra.type_repeater')}</option>
+        <option value="other">${t('config.infra.type_other')}</option>
       </select>
-      <button type="button" class="inline-remove-btn" onclick="removeInfra(this)" style="margin-left: auto;">Delete</button>
+      <button type="button" class="inline-remove-btn" onclick="removeInfra(this)" style="margin-left: auto;">${t('common.delete')}</button>
     </div>
   `;
   list.appendChild(div);
@@ -1149,7 +1151,7 @@ function addUnmanaged() {
   });
 
   if (!optionsHtml) {
-    optionsHtml = '<option value="" disabled>No managed switches configured</option>';
+    optionsHtml = `<option value="" disabled>${t('config.unmanaged.no_managed')}</option>`;
   }
 
   const div = document.createElement('div');
@@ -1159,12 +1161,12 @@ function addUnmanaged() {
   div.innerHTML = `
     <input type="hidden" name="unmanaged_keep[]" value="1">
     <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap; align-items: center;">
-      <input type="text" name="unmanaged_name[]" value="" placeholder="Switch Name (e.g. Desk Switch)" style="flex: 2; min-width: 150px;">
+      <input type="text" name="unmanaged_name[]" value="" placeholder="${t('config.unmanaged.name_placeholder')}" style="flex: 2; min-width: 150px;">
       <select name="unmanaged_parent_ip[]" style="background: #0d1117; border: 1px solid rgba(48, 54, 61, 0.8); border-radius: 6px; padding: 8px 12px; color: #e1e4e8; font-size: 13px; flex: 2; min-width: 150px; outline: none; cursor: pointer;">
         ${optionsHtml}
       </select>
-      <input type="number" name="unmanaged_parent_port[]" value="" placeholder="Port (e.g. 2)" min="1" max="52" style="flex: 1; min-width: 80px;">
-      <button type="button" class="inline-remove-btn" onclick="removeUnmanaged(this)" style="margin-left: auto;">Delete</button>
+      <input type="number" name="unmanaged_parent_port[]" value="" placeholder="${t('config.unmanaged.port_placeholder')}" min="1" max="52" style="flex: 1; min-width: 80px;">
+      <button type="button" class="inline-remove-btn" onclick="removeUnmanaged(this)" style="margin-left: auto;">${t('common.delete')}</button>
     </div>
   `;
   list.appendChild(div);
@@ -1266,7 +1268,7 @@ function loadTemplateList(selectFilename = null) {
   fetch('/api/templates')
     .then(res => res.json())
     .then(data => {
-      select.innerHTML = '<option value="" disabled selected>Select a Template...</option>';
+      select.innerHTML = `<option value="" disabled selected>${t('config.templates.select_placeholder')}</option>`;
       if (data.templates && data.templates.length > 0) {
         data.templates.forEach(tpl => {
           const opt = document.createElement('option');
@@ -1281,7 +1283,7 @@ function loadTemplateList(selectFilename = null) {
       }
     })
     .catch(err => {
-      showFeedback('Failed to load template list: ' + err.message, 'error');
+      showFeedback(t('config.templates.load_list_failed', { error: err.message }), 'error');
     });
 }
 
@@ -1294,12 +1296,12 @@ function loadSelectedTemplate() {
   
   cmEditor.setOption('readOnly', 'nocursor');
   saveBtn.disabled = true;
-  cmEditor.setValue('Loading template content...');
+  cmEditor.setValue(t('config.templates.loading_content'));
   
   fetch(`/api/templates/${filename}`)
     .then(res => {
       if (!res.ok) {
-        return res.json().then(data => { throw new Error(data.error || 'Server error'); });
+        return res.json().then(data => { throw new Error(data.error || t('common.server_error')); });
       }
       return res.json();
     })
@@ -1311,16 +1313,16 @@ function loadSelectedTemplate() {
     })
     .catch(err => {
       cmEditor.setValue('');
-      showFeedback('Failed to load template: ' + err.message, 'error');
+      showFeedback(t('config.templates.load_failed', { error: err.message }), 'error');
     });
 }
 
 function createNewTemplate() {
-  const modelName = prompt('Enter the Switch Model name (e.g. HC-SWTGW218AS or KP-9000):');
+  const modelName = prompt(t('config.templates.prompt_model'));
   if (!modelName) return;
   const cleanModel = modelName.trim().replace(/[^a-zA-Z0-9\-_]/g, '');
   if (!cleanModel) {
-    alert('Invalid Model name!');
+    alert(t('config.templates.invalid_model'));
     return;
   }
   const filename = cleanModel + '.yaml';
@@ -1332,7 +1334,7 @@ function createNewTemplate() {
   select.value = '';
   saveBtn.disabled = false;
   
-  showFeedback(`New blueprint initialized for ${cleanModel}. Click "Save Template" to create: ${filename}`, 'success');
+  showFeedback(t('config.templates.blueprint_created', { model: cleanModel, filename: filename }), 'success');
   onEditorChange();
 }
 
@@ -1343,10 +1345,10 @@ function onEditorChange() {
   
   if (!cmEditor) return;
   const text = cmEditor.getValue();
-  charCount.textContent = `${text.length} characters`;
+  charCount.textContent = t('common.characters_count', { count: text.length });
   
-  if (text.trim() === '' || text === 'Loading template content...') {
-    syntaxStatus.textContent = 'Empty';
+  if (text.trim() === '' || text === t('config.templates.loading_content')) {
+    syntaxStatus.textContent = t('config.templates.empty_status');
     saveBtn.disabled = true;
     return;
   }
@@ -1362,10 +1364,10 @@ function onEditorChange() {
   }
   
   if (!clean) {
-    syntaxStatus.textContent = 'Tabs detected (YAML forbids tabs)';
+    syntaxStatus.textContent = t('config.templates.tabs_detected');
     syntaxStatus.style.color = '#f85149';
   } else {
-    syntaxStatus.textContent = 'Formatting looks clean';
+    syntaxStatus.textContent = t('config.templates.formatting_clean');
     syntaxStatus.style.color = '#8b949e';
   }
   
@@ -1382,14 +1384,14 @@ function saveTemplate() {
     if (match && match[1]) {
       filename = match[1].trim().replace(/[^a-zA-Z0-9\-_]/g, '') + '.yaml';
     } else {
-      showFeedback('Error: Could not extract "model" attribute from the YAML content to determine filename!', 'error');
+      showFeedback(t('config.templates.missing_model_attr'), 'error');
       return;
     }
   }
   
   const saveBtn = document.getElementById('yaml-save-btn');
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving...';
+  saveBtn.textContent = t('config.templates.saving');
   
   fetch(`/api/templates/${filename}`, {
     method: 'POST',
@@ -1405,12 +1407,12 @@ function saveTemplate() {
     return res.json();
   })
   .then(data => {
-    showFeedback(`Template successfully saved: ${filename}`, 'success');
+    showFeedback(t('config.templates.saved', { filename: filename }), 'success');
     saveBtn.innerHTML = `
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
       </svg>
-      Save Template
+      ${t('config.templates.save_btn')}
     `;
     saveBtn.disabled = false;
     loadTemplateList(filename);
@@ -1421,7 +1423,7 @@ function saveTemplate() {
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
       </svg>
-      Save Template
+      ${t('config.templates.save_btn')}
     `;
     saveBtn.disabled = false;
   });
@@ -1485,7 +1487,7 @@ function executeReboot() {
   })
   .then(res => {
     if (!res.ok) {
-      return res.json().then(data => { throw new Error(data.error || 'Server returned error'); });
+      return res.json().then(data => { throw new Error(data.error || t('config.reboot_modal.server_returned_error')); });
     }
     return res.json();
   })
@@ -1514,12 +1516,12 @@ function loadVendorList() {
   const saveBtn = document.getElementById('vendor-save-btn');
   textarea.disabled = true;
   saveBtn.disabled = true;
-  textarea.value = 'Loading custom MAC vendors...';
+  textarea.value = t('config.vendors.loading');
   
   fetch('/api/vendors')
     .then(res => {
       if (!res.ok) {
-        return res.json().then(data => { throw new Error(data.error || 'Server error'); });
+        return res.json().then(data => { throw new Error(data.error || t('common.server_error')); });
       }
       return res.json();
     })
@@ -1532,7 +1534,7 @@ function loadVendorList() {
     })
     .catch(err => {
       textarea.value = '';
-      showVendorFeedback('Failed to load MAC vendors file: ' + err.message, 'error');
+      showVendorFeedback(t('config.vendors.load_failed', { error: err.message }), 'error');
     });
 }
 
@@ -1540,7 +1542,7 @@ function onVendorChange() {
   const textarea = document.getElementById('vendor-textarea');
   const charCount = document.getElementById('vendor-char-count');
   const text = textarea.value;
-  charCount.textContent = `${text.length} characters`;
+  charCount.textContent = t('common.characters_count', { count: text.length });
 }
 
 function saveVendorList() {
@@ -1549,7 +1551,7 @@ function saveVendorList() {
   const saveBtn = document.getElementById('vendor-save-btn');
   
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving...';
+  saveBtn.textContent = t('config.templates.saving');
   
   fetch('/api/vendors', {
     method: 'POST',
@@ -1565,12 +1567,12 @@ function saveVendorList() {
     return res.json();
   })
   .then(data => {
-    showVendorFeedback('MAC vendors list successfully saved!', 'success');
+    showVendorFeedback(t('config.vendors.saved'), 'success');
     saveBtn.innerHTML = `
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
       </svg>
-      Save MAC Vendors
+      ${t('config.vendors.save_btn')}
     `;
     saveBtn.disabled = false;
   })
@@ -1580,7 +1582,7 @@ function saveVendorList() {
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
       </svg>
-      Save MAC Vendors
+      ${t('config.vendors.save_btn')}
     `;
     saveBtn.disabled = false;
   });
@@ -1607,7 +1609,7 @@ function updateIeeeOui() {
   const feedbackBox = document.getElementById('oui-feedback');
   
   btn.disabled = true;
-  btn.textContent = 'Updating OUI Database...';
+  btn.textContent = t('config.oui.updating');
   showOuiFeedback('', 'none');
   
   fetch('/api/vendors/update_oui', {
@@ -1618,17 +1620,17 @@ function updateIeeeOui() {
   })
   .then(res => {
     if (!res.ok) {
-      return res.json().then(data => { throw new Error(data.message || data.error || 'Server error'); });
+      return res.json().then(data => { throw new Error(data.message || data.error || t('common.server_error')); });
     }
     return res.json();
   })
   .then(data => {
-    showOuiFeedback(data.message || 'IEEE OUI databases successfully updated!', 'success');
+    showOuiFeedback(data.message || t('config.oui.updated'), 'success');
     btn.innerHTML = `
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
       </svg>
-      Update IEEE OUI Database
+      ${t('config.oui.update_btn')}
     `;
     btn.disabled = false;
   })
@@ -1638,7 +1640,7 @@ function updateIeeeOui() {
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
       </svg>
-      Update IEEE OUI Database
+      ${t('config.oui.update_btn')}
     `;
     btn.disabled = false;
   });
@@ -1718,12 +1720,12 @@ function loadDeviceTypes() {
   const saveBtn = document.getElementById('device-types-save-btn');
   textarea.disabled = true;
   saveBtn.disabled = true;
-  textarea.value = 'Loading custom device types...';
+  textarea.value = t('config.device_types.loading');
   
   fetch('/api/device_types/raw')
     .then(res => {
       if (!res.ok) {
-        return res.json().then(data => { throw new Error(data.error || 'Server error'); });
+        return res.json().then(data => { throw new Error(data.error || t('common.server_error')); });
       }
       return res.json();
     })
@@ -1736,15 +1738,15 @@ function loadDeviceTypes() {
     .catch(err => {
       const feedback = document.getElementById('device-types-feedback');
       feedback.className = 'yaml-feedback error';
-      feedback.textContent = 'Failed to load device types: ' + err.message;
-      textarea.value = '# Error loading device types configuration.';
+      feedback.textContent = t('config.device_types.load_failed', { error: err.message });
+      textarea.value = t('config.device_types.load_error_comment');
     });
 }
 
 function onDeviceTypesChange() {
   const textarea = document.getElementById('device-types-textarea');
   const charCount = document.getElementById('device-types-char-count');
-  charCount.textContent = textarea.value.length + ' characters';
+  charCount.textContent = t('common.characters_count', { count: textarea.value.length });
 }
 
 function saveDeviceTypes() {
@@ -1754,7 +1756,7 @@ function saveDeviceTypes() {
   const feedback = document.getElementById('device-types-feedback');
   
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving...';
+  saveBtn.textContent = t('config.templates.saving');
   feedback.className = 'yaml-feedback';
   feedback.textContent = '';
   
@@ -1767,7 +1769,7 @@ function saveDeviceTypes() {
   })
   .then(res => {
     if (!res.ok) {
-      return res.json().then(data => { throw new Error(data.error || 'Syntax or Save error'); });
+      return res.json().then(data => { throw new Error(data.error || t('config.device_types.syntax_or_save_error')); });
     }
     return res.json();
   })
@@ -1776,9 +1778,9 @@ function saveDeviceTypes() {
     saveBtn.innerHTML = `
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
-      </svg> Save Device Types`;
+      </svg> ${t('config.device_types.save_btn')}`;
     feedback.className = 'yaml-feedback success';
-    feedback.textContent = 'Configuration successfully saved!';
+    feedback.textContent = t('config.device_types.saved');
     setTimeout(() => {
       feedback.textContent = '';
       feedback.className = 'yaml-feedback';
@@ -1789,9 +1791,9 @@ function saveDeviceTypes() {
     saveBtn.innerHTML = `
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0;">
         <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
-      </svg> Save Device Types`;
+      </svg> ${t('config.device_types.save_btn')}`;
     feedback.className = 'yaml-feedback error';
-    feedback.textContent = 'Save failed: ' + err.message;
+    feedback.textContent = t('config.device_types.save_failed', { error: err.message });
   });
 }
 </script>

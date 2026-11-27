@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ title }} - Subnet Scanner</title>
+<title>{{ title }} - {{ t('scanner.page_title') }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -52,7 +54,7 @@
     background: #58a6ff;
   }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0b0e14;
     color: #e1e4e8;
     padding: 24px;
@@ -83,7 +85,7 @@
     gap: 14px;
   }
   .header h1 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.5px;
@@ -637,26 +639,26 @@
 
 <div class="header">
   <div class="header-left">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
-    <h1>Subnet Discovery & Scanner</h1>
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <h1>{{ t('scanner.header_title') }}</h1>
   </div>
   <div class="nav-links">
     <span class="status">
       <span class="dot" id="live-dot"></span>
-      <span id="live-text">Live Polling</span>
+      <span id="live-text">{{ t('status.live_polling') }}</span>
     </span>
-    <span class="font-sizes" title="Font size">
+    <span class="font-sizes" title="{{ t('common.font_size_title') }}">
       <button class="fs-btn" data-size="sm" onclick="setFontSize('sm')">S</button>
       <button class="fs-btn fs-active" data-size="md" onclick="setFontSize('md')">M</button>
       <button class="fs-btn" data-size="lg" onclick="setFontSize('lg')">L</button>
       <button class="fs-btn" data-size="xl" onclick="setFontSize('xl')">XL</button>
     </span>
-    <a href="/">📊 Dashboard</a>
-    <a href="/map">🕸️ Network Map</a>
-    <a href="/scanner" class="active">🌐 Scanner</a>
-    <a href="/config">&#9881; Config</a>
-    <a href="/backups">💾 Backups</a>
-    <a href="/logs">📋 Logs</a>
+    <a href="/">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner" class="active">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs">📋 {{ t('nav.logs') }}</a>
   </div>
 </div>
 
@@ -664,19 +666,19 @@
   
   <div class="scanner-info-grid">
     <div class="info-tile">
-      <span class="tile-label">Subnet Range</span>
+      <span class="tile-label">{{ t('scanner.tiles.subnet_range') }}</span>
       <span class="tile-value" id="info-subnet-range">-</span>
     </div>
     <div class="info-tile">
-      <span class="tile-label">Discovery Thread</span>
+      <span class="tile-label">{{ t('scanner.tiles.discovery_thread') }}</span>
       <span class="tile-value" id="info-thread-status">-</span>
     </div>
     <div class="info-tile">
-      <span class="tile-label">Total Hosts Discovered</span>
+      <span class="tile-label">{{ t('scanner.tiles.total_hosts') }}</span>
       <span class="tile-value" id="info-total-hosts">0</span>
     </div>
     <div class="info-tile">
-      <span class="tile-label">Online / Offline</span>
+      <span class="tile-label">{{ t('scanner.tiles.online_offline') }}</span>
       <span class="tile-value"><span class="online" id="info-online-count">0</span> <span style="color:#484f58">/</span> <span class="offline" id="info-offline-count">0</span></span>
     </div>
   </div>
@@ -690,24 +692,24 @@
             <span class="slider"></span>
           </label>
           <span class="switch-label" id="refresh-label" onclick="document.getElementById('auto-refresh-checkbox').click();">
-            Auto Refresh
+            {{ t('scanner.controls.auto_refresh') }}
           </span>
         </div>
         <div class="refresh-interval-input-container">
-          <label for="refresh-interval-input">every</label>
+          <label for="refresh-interval-input">{{ t('scanner.controls.every') }}</label>
           <input type="number" id="refresh-interval-input" min="5" value="10">
-          <label for="refresh-interval-input">s</label>
+          <label for="refresh-interval-input">{{ t('scanner.controls.sec_unit') }}</label>
         </div>
       </div>
       <div class="control-group">
         <a href="/scanner/history" class="btn btn-secondary">
-          <span class="mdi mdi-history"></span> View Host History
+          <span class="mdi mdi-history"></span> {{ t('scanner.controls.view_history') }}
         </a>
       </div>
     </div>
 
     <fieldset class="column-toggle-fieldset">
-      <legend>Show/Hide Columns</legend>
+      <legend>{{ t('scanner.controls.show_hide_columns') }}</legend>
       <ul class="column-toggle-list" id="column-toggle-list">
         <!-- populated dynamically -->
       </ul>
@@ -718,7 +720,7 @@
         <colgroup></colgroup>
         <thead></thead>
         <tbody id="hosts-tbody">
-          <tr><td colspan="12" style="padding: 24px; text-align: center; color: #8b949e;">Loading scanner hosts data...</td></tr>
+          <tr><td colspan="12" style="padding: 24px; text-align: center; color: #8b949e;">{{ t('scanner.table.loading') }}</td></tr>
         </tbody>
       </table>
     </div>
@@ -728,20 +730,20 @@
 
 <div class="footer">
   <div>
-    <a href="/" style="color:#8b949e; text-decoration: none;">Dashboard</a> &middot; 
-    <a href="/config" style="color:#8b949e; text-decoration: none;">Switch Config</a> &middot; 
-    <a href="/backups" style="color:#8b949e; text-decoration: none;">Backups Manager</a> &middot; 
-    <a href="/api-docs" style="color:#8b949e; text-decoration: none;">API Reference</a> &middot; 
-    <a href="/logs" style="color:#8b949e; text-decoration: none;">Logs</a> &middot;
+    <a href="/" style="color:#8b949e; text-decoration: none;">{{ t('nav.dashboard') }}</a> &middot; 
+    <a href="/config" style="color:#8b949e; text-decoration: none;">{{ t('nav.switch_config') }}</a> &middot; 
+    <a href="/backups" style="color:#8b949e; text-decoration: none;">{{ t('nav.backups_manager') }}</a> &middot; 
+    <a href="/api-docs" style="color:#8b949e; text-decoration: none;">{{ t('nav.api_reference') }}</a> &middot; 
+    <a href="/logs" style="color:#8b949e; text-decoration: none;">{{ t('nav.logs') }}</a> &middot;
     <span class="version-badge">v{{ version }}</span>
   </div>
-  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
 </div>
 
 <!-- Toast notification box -->
 <div class="toast" id="toast-box">
   <span id="toast-icon">✓</span>
-  <span id="toast-message">Action completed successfully</span>
+  <span id="toast-message">{{ t('common.action_completed') }}</span>
 </div>
 
 <script>
@@ -794,38 +796,38 @@ const filters = {};
 // COLUMN_DEFS definition
 const COLUMN_DEFS = {
   del: {
-    label: 'Actions',
+    label: t('scanner.columns.del'),
     render: (cell, h) => {
       cell.className = 'action-cell';
-      cell.innerHTML = `<span class="mdi mdi-delete delete-icon" title="Delete host ${h.ip_address || h.mac_address}" data-ip="${h.mac_address}"></span>`;
+      cell.innerHTML = `<span class="mdi mdi-delete delete-icon" title="${t('scanner.table.delete_host_title', { label: h.ip_address || h.mac_address })}" data-ip="${h.mac_address}"></span>`;
     }
   },
   ip_address: {
-    label: 'IP Address',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.ip_address'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       cell.textContent = h.ip_address || '-';
       cell.style.fontWeight = '600';
     }
   },
   mac_address: {
-    label: 'MAC Address',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.mac_address'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       cell.textContent = h.mac_address || '-';
       cell.style.fontFamily = "'JetBrains Mono', monospace";
     }
   },
   vendor: {
-    label: 'Vendor',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.vendor'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
-      cell.textContent = h.vendor || 'Unknown';
+      cell.textContent = h.vendor || t('common.unknown');
     }
   },
   hostname: {
-    label: 'Hostname',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.hostname'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       const name = h.hostname || '';
       cell.className = 'editable-cell';
@@ -841,8 +843,8 @@ const COLUMN_DEFS = {
     }
   },
   known_host: {
-    label: 'Known',
-    filterPlaceholder: '1/0 or yes/no',
+    label: t('scanner.columns.known_host'),
+    filterPlaceholder: t('scanner.table.filter_known_placeholder'),
     render: (cell, h) => {
       cell.style.textAlign = 'center';
       const isKnown = h.known_host == 1;
@@ -855,24 +857,25 @@ const COLUMN_DEFS = {
     }
   },
   status: {
-    label: 'Status',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.status'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       const cls = h.status === 'ONLINE' ? 'online' : 'offline';
-      cell.innerHTML = `<span class="status-badge ${cls}"><span class="status-dot ${cls}"></span>${h.status}</span>`;
+      const statusText = h.status === 'ONLINE' ? t('common.online') : t('common.offline');
+      cell.innerHTML = `<span class="status-badge ${cls}"><span class="status-dot ${cls}"></span>${statusText}</span>`;
     }
   },
   ports: {
-    label: 'Ports',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.ports'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       cell.className = 'ports-cell';
       cell.textContent = h.ports || '-';
     }
   },
   note: {
-    label: 'Note',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.note'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       const note = h.note || '';
       cell.className = 'editable-cell';
@@ -888,8 +891,8 @@ const COLUMN_DEFS = {
     }
   },
   first_seen: {
-    label: 'First Seen',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.first_seen'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       cell.textContent = formatTimestamp(h.first_seen);
       cell.style.fontSize = '11.5px';
@@ -897,8 +900,8 @@ const COLUMN_DEFS = {
     }
   },
   last_seen_online: {
-    label: 'Last Seen Online',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.last_seen_online'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       cell.textContent = formatTimestamp(h.last_seen_online);
       cell.style.fontSize = '11.5px';
@@ -906,8 +909,8 @@ const COLUMN_DEFS = {
     }
   },
   last_updated: {
-    label: 'Last Updated',
-    filterPlaceholder: 'Filter...',
+    label: t('scanner.columns.last_updated'),
+    filterPlaceholder: t('scanner.table.filter_placeholder'),
     render: (cell, h) => {
       cell.textContent = formatTimestamp(h.last_updated);
       cell.style.fontSize = '11.5px';
@@ -960,12 +963,12 @@ function showToast(message, type = 'success', icon = '✓') {
 }
 
 function formatTimestamp(tsString) {
-  if (!tsString) return 'N/A';
+  if (!tsString) return t('common.na');
   try {
     const tParts = tsString.replace(' ', 'T');
     const dateObj = new Date(tParts.includes('Z') || tParts.includes('+') ? tParts : tParts + 'Z');
     if (isNaN(dateObj)) return tsString;
-    return dateObj.toLocaleString(undefined, {
+    return dateObj.toLocaleString(window.I18N_LOCALE || undefined, {
       month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
   } catch (e) {
@@ -978,16 +981,16 @@ function updateStatusDot(active) {
   if (active) {
     liveDot.className = "dot";
     if (pollingPaused) {
-      liveText.textContent = "Paused";
+      liveText.textContent = t("status.paused");
     } else {
-      liveText.textContent = `Live Polling (update in ${countdownSeconds}s)`;
+      liveText.textContent = t("status.live_polling_update_in", { seconds: countdownSeconds });
     }
   } else {
     liveDot.className = "dot paused";
     if (pollingPaused) {
-      liveText.textContent = "Paused";
+      liveText.textContent = t("status.paused");
     } else {
-      liveText.textContent = "Polling Paused";
+      liveText.textContent = t("status.polling_paused");
     }
   }
 }
@@ -1050,9 +1053,9 @@ async function fetchScannerConfigAndStatus() {
     const threadStatusVal = document.getElementById('info-thread-status');
     if (threadStatusVal) {
       if (settings.scanner_enabled) {
-        threadStatusVal.innerHTML = '<span style="color:#3fb950;font-weight:600;">RUNNING</span>';
+        threadStatusVal.innerHTML = `<span style="color:#3fb950;font-weight:600;">${t('status.running')}</span>`;
       } else {
-        threadStatusVal.innerHTML = '<span style="color:#8b949e;font-weight:600;">DISABLED</span>';
+        threadStatusVal.innerHTML = `<span style="color:#8b949e;font-weight:600;">${t('status.disabled')}</span>`;
       }
     }
   } catch(e) {}
@@ -1063,7 +1066,7 @@ async function fetchHosts() {
   if (pollingPaused) return;
   try {
     const response = await fetch('/api/scanner/hosts');
-    if (!response.ok) throw new Error("HTTP " + response.status);
+    if (!response.ok) throw new Error(t("common.http_error", { status: response.status }));
     const data = await response.json();
     if (Array.isArray(data)) {
       allHostsData = data;
@@ -1079,7 +1082,7 @@ async function fetchHosts() {
   } catch (error) {
     console.error("Fetch hosts error:", error);
     if (tableBody && allHostsData.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="${columnOrder.length}" style="color:#f85149;text-align:center;padding:16px;">Error loading data: ${error.message}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="${columnOrder.length}" style="color:#f85149;text-align:center;padding:16px;">${t('scanner.table.error_loading', { error: error.message })}</td></tr>`;
     }
   }
 }
@@ -1104,9 +1107,13 @@ function filterHostData(hosts, filters) {
         if (key === 'known_host') {
           const knownVal = host[key];
           let matches = false;
-          if ((filterValue === 'yes' || filterValue === '1' || filterValue.startsWith('y')) && knownVal == 1) matches = true;
-          else if ((filterValue === 'no' || filterValue === '0' || filterValue.startsWith('n')) && knownVal == 0) matches = true;
+          if ((filterValue === 'yes' || filterValue === '1' || filterValue.startsWith('y') || filterValue === '예' || filterValue === '네') && knownVal == 1) matches = true;
+          else if ((filterValue === 'no' || filterValue === '0' || filterValue.startsWith('n') || filterValue.startsWith('아니')) && knownVal == 0) matches = true;
           if (!matches) return false;
+        } else if (key === 'status') {
+          const localizedStatus = host[key] === 'ONLINE' ? t('common.online') : t('common.offline');
+          const hostValue = `${host[key] || ''} ${localizedStatus}`.toLowerCase();
+          if (!hostValue.includes(filterValue)) return false;
         } else {
           const hostValue = String(host[key] || '').toLowerCase();
           if (!hostValue.includes(filterValue)) return false;
@@ -1133,7 +1140,7 @@ function renderTable(hosts) {
   const visibleColumnCount = columnOrder.filter(colId => columnVisibilityState[colId] !== false).length;
   
   if (hosts.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="${visibleColumnCount || 12}" style="padding: 24px; text-align: center; color: #8b949e;">No matching hosts found.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="${visibleColumnCount || 12}" style="padding: 24px; text-align: center; color: #8b949e;">${t('scanner.table.empty')}</td></tr>`;
     return;
   }
   
@@ -1195,16 +1202,16 @@ async function handleKnownSwitchChange(event) {
       body: JSON.stringify({ known: state })
     });
     const result = await res.json();
-    if (!res.ok || !result.success) throw new Error(result.error || "Save failed");
+    if (!res.ok || !result.success) throw new Error(result.error || t("scanner.toast.save_failed"));
     
     // Update local data
     const idx = allHostsData.findIndex(h => h.mac_address === mac);
     if (idx > -1) allHostsData[idx].known_host = state;
     const hostLabel = (idx > -1) ? (allHostsData[idx].hostname || allHostsData[idx].ip_address || mac) : mac;
-    showToast(`Known status for ${hostLabel} saved`, 'success', '✓');
+    showToast(t('scanner.toast.known_saved', { label: hostLabel }), 'success', '✓');
   } catch (err) {
     cb.checked = !cb.checked;
-    showToast(`Failed to update status: ${err.message}`, 'error', '⚠️');
+    showToast(t('scanner.toast.status_update_failed', { error: err.message }), 'error', '⚠️');
   } finally {
     cb.disabled = false;
   }
@@ -1214,22 +1221,22 @@ async function handleDeleteHost(target) {
   const mac = target.dataset.ip;
   const idx = allHostsData.findIndex(h => h.mac_address === mac);
   const hostLabel = (idx > -1) ? (allHostsData[idx].hostname || allHostsData[idx].ip_address || mac) : mac;
-  if (!mac || !window.confirm(`Are you sure you want to permanently delete host ${hostLabel}?`)) return;
+  if (!mac || !window.confirm(t("scanner.toast.confirm_delete", { label: hostLabel }))) return;
   
   target.style.opacity = '0.5';
   target.style.pointerEvents = 'none';
   try {
     const res = await fetch(`/api/scanner/hosts/${mac}`, { method: 'DELETE' });
     const result = await res.json();
-    if (!res.ok || !result.success) throw new Error(result.error || "Delete failed");
+    if (!res.ok || !result.success) throw new Error(result.error || t("scanner.toast.delete_failed"));
     
-    showToast(`Host ${hostLabel} deleted successfully`, 'success', '🗑️');
+    showToast(t('scanner.toast.host_deleted', { label: hostLabel }), 'success', '🗑️');
     allHostsData = allHostsData.filter(h => h.mac_address !== mac);
     applyFiltersAndRender();
   } catch(err) {
     target.style.opacity = '1';
     target.style.pointerEvents = 'auto';
-    showToast(`Delete failed: ${err.message}`, 'error', '⚠️');
+    showToast(t('scanner.toast.delete_error', { error: err.message }), 'error', '⚠️');
   }
 }
 
@@ -1260,7 +1267,7 @@ function makeCellEditable(cell) {
     
     const newVal = input.value.trim();
     if (save && newVal !== originalVal) {
-      cell.textContent = "Saving...";
+      cell.textContent = t("scanner.table.saving");
       try {
         const res = await fetch(`/api/scanner/hosts/${mac}/update`, {
           method: 'POST',
@@ -1268,9 +1275,10 @@ function makeCellEditable(cell) {
           body: JSON.stringify({ field: field, value: newVal })
         });
         const result = await res.json();
-        if (!res.ok || !result.success) throw new Error(result.error || "Save failed");
+        if (!res.ok || !result.success) throw new Error(result.error || t("scanner.toast.save_failed"));
         
-        showToast(`${field} updated successfully`, 'success', '✓');
+        const fieldLabel = field === 'hostname' ? t('scanner.columns.hostname') : t('scanner.columns.note');
+        showToast(t('scanner.toast.field_updated', { field: fieldLabel }), 'success', '✓');
         const idx = allHostsData.findIndex(h => h.mac_address === mac);
         if (idx > -1) allHostsData[idx][field] = newVal;
         
@@ -1282,7 +1290,7 @@ function makeCellEditable(cell) {
           cell.classList.add('hostname-placeholder');
         }
       } catch (err) {
-        showToast(`Update failed: ${err.message}`, 'error', '⚠️');
+        showToast(t('scanner.toast.update_failed', { error: err.message }), 'error', '⚠️');
         revert(originalVal);
       }
     } else {
@@ -1342,7 +1350,7 @@ function startAutoRefresh() {
       }
       countdownSeconds--;
       if (countdownSeconds <= 0) {
-        if (liveText) liveText.textContent = 'Updating...';
+        if (liveText) liveText.textContent = t('status.updating');
         countdownSeconds = intervalSec;
         fetchHosts();
       } else {
@@ -1359,10 +1367,10 @@ function handleRefreshToggleChange() {
   updateStatusDot(isAutoRefreshEnabled);
   if (isAutoRefreshEnabled) {
     startAutoRefresh();
-    showToast("Auto-refresh active", 'success', '▶️');
+    showToast(t("scanner.toast.auto_refresh_active"), 'success', '▶️');
   } else {
     stopAutoRefresh();
-    showToast("Auto-refresh paused", 'success', '⏸️');
+    showToast(t("scanner.toast.auto_refresh_paused"), 'success', '⏸️');
   }
 }
 
@@ -1483,7 +1491,7 @@ function initTableHeaders() {
       input.type = 'text';
       input.id = `filter-${colId}`;
       input.className = 'filter-input';
-      input.placeholder = COLUMN_DEFS[colId].filterPlaceholder || 'Filter...';
+      input.placeholder = COLUMN_DEFS[colId].filterPlaceholder || t('scanner.table.filter_placeholder');
       if (currentFilters[colId]) {
         input.value = currentFilters[colId];
       }

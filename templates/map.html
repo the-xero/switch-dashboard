@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>{{ title }} - Network Map</title>
+<title>{{ title }} - {{ t('map.page_title') }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="icon" href="/static/logo.png" type="image/png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0d0f14; color: #e1e4e8;
     background-image: radial-gradient(circle at 10% 20%, rgba(20, 24, 33, 0.8) 0%, rgba(13, 15, 20, 1) 90.2%);
     background-attachment: fixed;
@@ -575,20 +577,20 @@
 
 <div class="header">
   <div class="header-left">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
-    <h1 style="font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; background: linear-gradient(135deg, #ffffff 30%, #a5c2f4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Network Map</h1>
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <h1 style="font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; background: linear-gradient(135deg, #ffffff 30%, #a5c2f4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ t('map.page_title') }}</h1>
   </div>
   <div class="nav-links">
     <span class="status">
       <span class="dot" id="live-dot"></span>
-      <span id="live-text">Live</span>
+      <span id="live-text">{{ t('status.live') }}</span>
     </span>
-    <a href="/">📊 Dashboard</a>
-    <a href="/map" class="active">🕸️ Network Map</a>
-    <a href="/scanner">🌐 Scanner</a>
-    <a href="/config">&#9881; Config</a>
-    <a href="/backups">💾 Backups</a>
-    <a href="/logs">📋 Logs</a>
+    <a href="/">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map" class="active">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs">📋 {{ t('nav.logs') }}</a>
   </div>
 </div>
 
@@ -603,16 +605,16 @@
   </div>
 
   <!-- Button to open sidebar when collapsed -->
-  <button class="open-sidebar-btn" id="open-sidebar-btn" onclick="toggleSidebar(true)" title="Open Inspector & Controls">
-    &#9776; Inspector
+  <button class="open-sidebar-btn" id="open-sidebar-btn" onclick="toggleSidebar(true)" title="{{ t('map.inspector_btn_title') }}">
+    &#9776; {{ t('map.inspector_btn') }}
   </button>
 
   <!-- Zoom, Center & Orientation Controls -->
   <div class="map-controls">
-    <button class="map-btn" onclick="zoom(1.2)" title="Zoom In">+</button>
-    <button class="map-btn" onclick="zoom(0.8)" title="Zoom Out">-</button>
-    <button class="map-btn" onclick="resetZoom()" title="Recenter Map">&#8982;</button>
-    <button class="map-btn" id="floating-dir-btn" onclick="toggleLayoutDirection()" title="Toggle Layout Direction (Left-to-Right / Top-to-Bottom)">&#8644;</button>
+    <button class="map-btn" onclick="zoom(1.2)" title="{{ t('map.zoom_in') }}">+</button>
+    <button class="map-btn" onclick="zoom(0.8)" title="{{ t('map.zoom_out') }}">-</button>
+    <button class="map-btn" onclick="resetZoom()" title="{{ t('map.recenter') }}">&#8982;</button>
+    <button class="map-btn" id="floating-dir-btn" onclick="toggleLayoutDirection()" title="{{ t('map.toggle_direction_title') }}">&#8644;</button>
   </div>
 
   <!-- Canvas Container -->
@@ -632,7 +634,7 @@
   <!-- Device Details Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="panel-header">
-      <h2>Device Inspector</h2>
+      <h2>{{ t('map.device_inspector') }}</h2>
       <button class="close-sidebar-btn" onclick="toggleSidebar(false)">&times;</button>
     </div>
     <div class="panel-content">
@@ -640,29 +642,29 @@
       <!-- Interactive Search -->
       <div class="search-box">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="search-input" placeholder="Search MAC, vendor, IP or name..." oninput="handleSearchInput(this.value)">
+        <input type="text" id="search-input" placeholder="{{ t('map.search_placeholder') }}" oninput="handleSearchInput(this.value)">
         <div class="search-suggestions" id="search-suggestions"></div>
       </div>
 
       <!-- Controls Panel -->
       <div class="control-card">
-        <h3>Map Controls</h3>
+        <h3>{{ t('map.map_controls') }}</h3>
         <div class="control-row">
-          <span>Layout Direction</span>
+          <span>{{ t('map.layout_direction') }}</span>
           <div class="direction-group">
-            <button type="button" class="direction-opt active" id="dir-btn-lr" onclick="setLayoutDirection('LR')" title="UniFi Horizontal (Left to Right)">L &rarr; R</button>
-            <button type="button" class="direction-opt" id="dir-btn-tb" onclick="setLayoutDirection('TB')" title="Vertical (Top to Bottom)">T &darr; B</button>
+            <button type="button" class="direction-opt active" id="dir-btn-lr" onclick="setLayoutDirection('LR')" title="{{ t('map.dir_lr_title') }}">{{ t('map.dir_lr') }}</button>
+            <button type="button" class="direction-opt" id="dir-btn-tb" onclick="setLayoutDirection('TB')" title="{{ t('map.dir_tb_title') }}">{{ t('map.dir_tb') }}</button>
           </div>
         </div>
         <div class="control-row">
-          <span>Show Clients</span>
+          <span>{{ t('map.show_clients') }}</span>
           <label class="switch-toggle">
             <input type="checkbox" id="toggle-clients" checked onchange="handleClientToggle()">
             <span class="slider"></span>
           </label>
         </div>
         <div class="control-row">
-          <span>Active Marching Lines</span>
+          <span>{{ t('map.marching_lines') }}</span>
           <label class="switch-toggle">
             <input type="checkbox" id="toggle-marching" checked onchange="handleMarchingToggle()">
             <span class="slider"></span>
@@ -670,7 +672,7 @@
         </div>
         <div class="control-row" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(48, 54, 61, 0.4);">
           <button type="button" class="map-btn" onclick="resetLayout()" style="width: 100%; height: auto; padding: 8px 12px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600;">
-            🔄 Reset Layout
+            🔄 {{ t('map.reset_layout') }}
           </button>
         </div>
       </div>
@@ -679,7 +681,7 @@
       <div class="control-card" id="detail-card">
         <div class="empty-state">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          <p>Select a node on the map to inspect properties and active links.</p>
+          <p>{{ t('map.empty_hint') }}</p>
         </div>
       </div>
 
@@ -831,8 +833,8 @@
     const isClient = node.type === 'client';
     let sublabelVal = '';
     if (node.type === 'switch') sublabelVal = node.ip || '';
-    else if (node.type === 'unmanaged_switch') sublabelVal = `Unmanaged (Port ${node.parent_port})`;
-    else if (node.type === 'internet') sublabelVal = 'WAN External';
+    else if (node.type === 'unmanaged_switch') sublabelVal = t('map.unmanaged_sublabel', { port: node.parent_port });
+    else if (node.type === 'internet') sublabelVal = t('map.wan_external');
     else sublabelVal = formatMacAddress(node.mac) || '';
 
     let displayName = node.name || '';
@@ -890,7 +892,7 @@
       const liveText = document.getElementById('live-text');
       const liveDot = document.getElementById('live-dot');
       if (liveText && liveDot) {
-        liveText.textContent = `Live (update in ${countdownSeconds}s)`;
+        liveText.textContent = t('status.live_update_in', { seconds: countdownSeconds });
         liveDot.className = 'dot';
       }
     } catch (e) {
@@ -898,7 +900,7 @@
       const liveText = document.getElementById('live-text');
       const liveDot = document.getElementById('live-dot');
       if (liveText && liveDot) {
-        liveText.textContent = 'Error';
+        liveText.textContent = t('status.error');
         liveDot.className = 'dot error';
       }
     }
@@ -1964,7 +1966,18 @@
       iconSvg = ICONS[dType] || ICONS.laptop || ICONS.client;
     }
 
-    const formattedMac = formatMacAddress(node.mac) || 'N/A';
+    function getNodeTypeLabel(n) {
+      if (n.type === 'unmanaged_switch') return t('map.type_unmanaged_switch');
+      if (n.type === 'internet') return t('map.type_internet');
+      if (n.type === 'router' || (n.model && n.model.toLowerCase() === 'fritzbox')) return t('map.type_router_gateway');
+      if (n.type === 'switch') return t('map.type_switch');
+      if (n.type === 'repeater') return t('map.type_repeater');
+      if (n.type === 'client') return t('map.type_client');
+      return t('map.type_other');
+    }
+
+    const formattedMac = formatMacAddress(node.mac) || t('common.na');
+    const statusLabel = node.status === 'online' ? t('common.online') : t('common.offline');
     
     let iconContent = iconSvg;
     if (!iconContent.trim().startsWith('<')) {
@@ -1978,7 +1991,7 @@
         </div>
         <div class="detail-title">
           <h3>${node.name}</h3>
-          <p style="color: ${avatarColor};">${node.type === 'unmanaged_switch' ? 'UNMANAGED SWITCH' : (node.type === 'internet' ? 'INTERNET WAN' : (node.model && node.model.toLowerCase() === 'fritzbox' ? 'ROUTER / GATEWAY' : node.type.toUpperCase()))}</p>
+          <p style="color: ${avatarColor};">${getNodeTypeLabel(node)}</p>
         </div>
       </div>
     `;
@@ -1986,81 +1999,81 @@
     if (node.type === 'switch') {
       html += `
         <div class="detail-item">
-          <div class="label">IP Address</div>
+          <div class="label">${t('map.detail.ip_address')}</div>
           <div class="value mono">${node.ip}</div>
         </div>
         <div class="detail-item">
-          <div class="label">MAC Address</div>
+          <div class="label">${t('map.detail.mac_address')}</div>
           <div class="value mono">${formattedMac}</div>
         </div>
         <div class="detail-item">
-          <div class="label">Hardware Model</div>
-          <div class="value">${node.model || 'Generic Model'}</div>
+          <div class="label">${t('map.detail.hardware_model')}</div>
+          <div class="value">${node.model || t('map.detail.generic_model')}</div>
         </div>
         <div class="detail-item">
-          <div class="label">Status</div>
+          <div class="label">${t('map.detail.status')}</div>
           <div class="value" style="color: ${node.status === 'online' ? '#3fb950' : '#f85149'}">
-            ${node.status.toUpperCase()}
+            ${statusLabel}
           </div>
         </div>
         <div class="control-row" style="margin-top: 14px;">
-          <a href="/config" class="map-btn" style="width: auto; height: auto; padding: 6px 12px; font-size: 11px; text-decoration: none;">Configure Switch</a>
+          <a href="/config" class="map-btn" style="width: auto; height: auto; padding: 6px 12px; font-size: 11px; text-decoration: none;">${t('map.detail.configure_switch')}</a>
         </div>
       `;
     } else if (node.type === 'unmanaged_switch') {
       html += `
         <div class="detail-item">
-          <div class="label">Parent Switch</div>
+          <div class="label">${t('map.detail.parent_switch')}</div>
           <div class="value">${node.parent_ip}</div>
         </div>
         <div class="detail-item">
-          <div class="label">Parent Port</div>
-          <div class="value">Port ${node.parent_port}</div>
+          <div class="label">${t('map.detail.parent_port')}</div>
+          <div class="value">${t('common.port_label', { port: node.parent_port })}</div>
         </div>
         <div class="detail-item">
-          <div class="label">Status</div>
+          <div class="label">${t('map.detail.status')}</div>
           <div class="value" style="color: ${node.status === 'online' ? '#3fb950' : '#f85149'}">
-            ${node.status.toUpperCase()}
+            ${statusLabel}
           </div>
         </div>
       `;
     } else if (node.type === 'internet') {
       html += `
         <div class="detail-item">
-          <div class="label">Connection Type</div>
-          <div class="value">WAN External (ONT)</div>
+          <div class="label">${t('map.detail.connection_type')}</div>
+          <div class="value">${t('map.wan_external_ont')}</div>
         </div>
         <div class="detail-item">
-          <div class="label">Status</div>
+          <div class="label">${t('map.detail.status')}</div>
           <div class="value" style="color: ${node.status === 'online' ? '#3fb950' : '#f85149'}">
-            ${node.status.toUpperCase()}
+            ${statusLabel}
           </div>
         </div>
       `;
     } else {
       html += `
         <div class="detail-item">
-          <div class="label">MAC Address</div>
+          <div class="label">${t('map.detail.mac_address')}</div>
           <div class="value mono">${formattedMac}</div>
         </div>
         <div class="detail-item">
-          <div class="label">Status</div>
+          <div class="label">${t('map.detail.status')}</div>
           <div class="value" style="color: ${node.status === 'online' ? '#3fb950' : '#f85149'}">
-            ${node.status.toUpperCase()}
+            ${statusLabel}
           </div>
         </div>
       `;
       if (node.vendor) {
         html += `
           <div class="detail-item">
-            <div class="label">Manufacturer Vendor</div>
+            <div class="label">${t('map.detail.vendor')}</div>
             <div class="value">${node.vendor}</div>
           </div>
         `;
       }
       
       if (node.type === 'client') {
-        const lastSeenStr = node.last_seen_time ? new Date(node.last_seen_time * 1000).toLocaleString() : 'Never';
+        const lastSeenStr = node.last_seen_time ? formatLocaleDateTime(node.last_seen_time * 1000) : t('common.never');
         
         let dropdownHtml = '';
         const typesToRender = Object.keys(deviceTypes).length > 0 ? deviceTypes : {
@@ -2090,10 +2103,10 @@
 
         html += `
           <div class="detail-item">
-            <div class="label">Host Nickname</div>
+            <div class="label">${t('map.detail.host_nickname')}</div>
             <div class="value" style="margin-top: 4px;">
               <input type="text" id="inspect-host-input" value="${node.host || ''}" 
-                     placeholder="Enter device nickname..." 
+                     placeholder="${t('map.detail.host_placeholder')}" 
                      onblur="updateClientHost('${node.id}', this.value)"
                      style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 6px 10px; color: #e1e4e8; font-size: 12px; outline: none; transition: border-color 0.2s;"
                      onfocus="this.style.borderColor='#58a6ff'" 
@@ -2101,7 +2114,7 @@
             </div>
           </div>
           <div class="detail-item">
-            <div class="label">Device Type</div>
+            <div class="label">${t('map.detail.device_type')}</div>
             <div class="value" style="margin-top: 4px;">
               <select id="inspect-type-select" onchange="updateClientType('${node.id}', this.value)"
                       style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 6px 10px; color: #e1e4e8; font-size: 12px; outline: none; cursor: pointer; transition: border-color 0.2s;"
@@ -2112,16 +2125,16 @@
             </div>
           </div>
           <div class="detail-item">
-            <div class="label">Last Location</div>
+            <div class="label">${t('map.detail.last_location')}</div>
             <div class="value">${node.last_seen_ip}:${node.last_seen_port}</div>
           </div>
           <div class="detail-item">
-            <div class="label">Last Active</div>
+            <div class="label">${t('map.detail.last_active')}</div>
             <div class="value">${lastSeenStr}</div>
           </div>
           <div class="control-row" style="margin-top: 18px;">
             <button type="button" onclick="forgetClient('${node.id}')" class="map-btn" style="width: 100%; background: #da3637; border-color: #f85149; height: auto; padding: 8px 12px;" onmouseover="this.style.background='#f85149'" onmouseout="this.style.background='#da3637'">
-              Forget Device
+              ${t('map.detail.forget_device')}
             </button>
           </div>
         `;
@@ -2133,7 +2146,7 @@
     if (connectedLinks.length > 0) {
       html += `
         <div style="border-top: 1px solid rgba(48, 54, 61, 0.4); margin-top: 14px; padding-top: 10px;">
-          <h3 style="font-size: 11px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600;">Active Connections</h3>
+          <h3 style="font-size: 11px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600;">${t('map.detail.active_connections')}</h3>
       `;
       connectedLinks.forEach(link => {
         const isSource = link.source === node.id;
@@ -2153,7 +2166,7 @@
               <span style="color: #58a6ff;">${link.speed}</span>
             </div>
             <div style="color: #8b949e; margin-top: 4px; display: flex; justify-content: space-between;">
-              <span>${portLabel ? portLabel : 'Direct'}</span>
+              <span>${portLabel ? portLabel : t('map.detail.direct')}</span>
               <span>${otherPortLabel ? otherPortLabel : ''}</span>
             </div>
           </div>
@@ -2181,11 +2194,11 @@
     if (link.tx_bps || link.rx_bps) {
       trafficHtml = `
         <div class="row" style="margin-top: 4px; border-top: 1px dashed rgba(48, 54, 61, 0.4); padding-top: 4px;">
-          <span>TX Speed:</span>
+          <span>${t('map.tooltip.tx_speed')}</span>
           <span class="val blue">${formatTraffic(link.tx_bps)}</span>
         </div>
         <div class="row">
-          <span>RX Speed:</span>
+          <span>${t('map.tooltip.rx_speed')}</span>
           <span class="val green">${formatTraffic(link.rx_bps)}</span>
         </div>
       `;
@@ -2193,19 +2206,19 @@
 
     tooltip.innerHTML = `
       <div class="title">
-        <span>Connection Link</span>
+        <span>${t('map.tooltip.title')}</span>
         <span style="color: ${speedColor}">${link.speed}</span>
       </div>
       <div class="row">
-        <span>Source:</span>
+        <span>${t('map.tooltip.source')}</span>
         <span class="val">${source.name}</span>
       </div>
-      ${link.source_port ? `<div class="row"><span>Port:</span><span class="val">${link.source_port}</span></div>` : ''}
+      ${link.source_port ? `<div class="row"><span>${t('map.tooltip.port')}</span><span class="val">${link.source_port}</span></div>` : ''}
       <div class="row" style="margin-top: 4px;">
-        <span>Destination:</span>
+        <span>${t('map.tooltip.destination')}</span>
         <span class="val">${target.name}</span>
       </div>
-      ${link.target_port ? `<div class="row"><span>Port:</span><span class="val">${link.target_port}</span></div>` : ''}
+      ${link.target_port ? `<div class="row"><span>${t('map.tooltip.port')}</span><span class="val">${link.target_port}</span></div>` : ''}
       ${trafficHtml}
     `;
     tooltip.style.display = 'block';
@@ -2251,7 +2264,7 @@
     });
 
     if (matches.length === 0) {
-      suggestionsPanel.innerHTML = '<div style="padding:8px 12px; font-size:11px; color:#8b949e;">No devices found</div>';
+      suggestionsPanel.innerHTML = `<div style="padding:8px 12px; font-size:11px; color:#8b949e;">${t('map.no_devices_found')}</div>`;
       suggestionsPanel.style.display = 'block';
       return;
     }
@@ -2260,8 +2273,8 @@
     matches.slice(0, 5).forEach(node => {
       html += `
         <div class="search-suggestion-item" onclick="triggerDeviceHighlight('${node.id}')">
-          <span>${node.name} <span style="font-size:10px; color:#8b949e; margin-left:6px;">(${node.type === 'switch' ? node.ip : (node.type === 'unmanaged_switch' ? 'Port ' + node.parent_port : formatMacAddress(node.mac))})</span></span>
-          <span class="type">${node.type}</span>
+          <span>${node.name} <span style="font-size:10px; color:#8b949e; margin-left:6px;">(${node.type === 'switch' ? node.ip : (node.type === 'unmanaged_switch' ? t('common.port_label', { port: node.parent_port }) : formatMacAddress(node.mac))})</span></span>
+          <span class="type">${node.type === 'unmanaged_switch' ? t('map.type_unmanaged_switch') : (node.type === 'internet' ? t('map.type_internet') : (node.type === 'router' ? t('map.type_router_gateway') : (node.type === 'switch' ? t('map.type_switch') : (node.type === 'repeater' ? t('map.type_repeater') : (node.type === 'client' ? t('map.type_client') : t('map.type_other'))))))}</span>
         </div>
       `;
     });
@@ -2341,7 +2354,7 @@
   }
 
   async function forgetClient(mac) {
-    if (!confirm("Are you sure you want to forget and remove this client device?")) {
+    if (!confirm(t("map.confirm_forget"))) {
       return;
     }
     try {
@@ -2386,19 +2399,19 @@
       );
       
       if (isInteracting) {
-        liveText.textContent = 'Paused';
+        liveText.textContent = t('status.paused');
         liveDot.className = 'dot paused';
         return;
       }
       
       countdownSeconds--;
       if (countdownSeconds <= 0) {
-        liveText.textContent = 'Updating...';
+        liveText.textContent = t('status.updating');
         liveDot.className = 'dot paused';
         countdownSeconds = 10;
         fetchTopology();
       } else {
-        liveText.textContent = `Live (update in ${countdownSeconds}s)`;
+        liveText.textContent = t('status.live_update_in', { seconds: countdownSeconds });
         liveDot.className = 'dot';
       }
     }, 1000);

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ title }} - Backups Manager</title>
+<title>{{ title }} - {{ t('backups.page_title') }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,7 +13,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0b0e14;
     color: #e1e4e8;
     padding: 24px;
@@ -42,7 +44,7 @@
     gap: 14px;
   }
   .header h1 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.5px;
@@ -419,48 +421,48 @@
 
 <div class="header">
   <div class="header-left">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
-    <h1>Switch Backups Manager</h1>
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <h1>{{ t('backups.header_title') }}</h1>
   </div>
   <div class="nav-links">
-    <a href="/">📊 Dashboard</a>
-    <a href="/map">🕸️ Network Map</a>
-    <a href="/scanner">🌐 Scanner</a>
-    <a href="/config">&#9881; Config</a>
-    <a href="/backups" class="active">💾 Backups</a>
-    <a href="/logs">📋 Logs</a>
+    <a href="/">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups" class="active">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs">📋 {{ t('nav.logs') }}</a>
   </div>
 </div>
 
 <div class="container">
   <div class="card">
     <div class="card-title">
-      <span>🗂️</span> Saved Configuration Backups
+      <span>🗂️</span> {{ t('backups.card_title') }}
     </div>
     
     <div id="table-wrapper">
       <div style="text-align: center; padding: 40px;" id="loading-spinner">
         <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(88,166,255,0.1); border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="margin-top: 12px; color: #8b949e; font-size: 13.5px;">Loading backup archives...</p>
+        <p style="margin-top: 12px; color: #8b949e; font-size: 13.5px;">{{ t('backups.loading') }}</p>
       </div>
     </div>
   </div>
 </div>
 
 <div class="footer">
-  <div><a href="/" style="color:#8b949e">Dashboard</a> &middot; <a href="/config" style="color:#8b949e">Switch Config</a> &middot; <a href="/api-docs" style="color:#8b949e">API Reference</a> &middot; <a href="/logs" style="color:#8b949e">Logs</a> &middot; <span class="version-badge">v{{ version }}</span></div>
-  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+  <div><a href="/" style="color:#8b949e">{{ t('nav.dashboard') }}</a> &middot; <a href="/config" style="color:#8b949e">{{ t('nav.switch_config') }}</a> &middot; <a href="/api-docs" style="color:#8b949e">{{ t('nav.api_reference') }}</a> &middot; <a href="/logs" style="color:#8b949e">{{ t('nav.logs') }}</a> &middot; <span class="version-badge">v{{ version }}</span></div>
+  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
 </div>
 
 <!-- Delete Confirm Dialog -->
 <div class="modal-overlay" id="delete-modal">
   <div class="modal-box">
-    <h3>⚠️ Confirm Deletion</h3>
-    <p>Are you sure you want to permanently delete this configuration backup from the server? This action cannot be undone.</p>
+    <h3>⚠️ {{ t('backups.modal.title') }}</h3>
+    <p>{{ t('backups.modal.desc') }}</p>
     <div class="modal-filename" id="modal-filename-display">switch_cfg_192-168-1-100_20260521_1519.bin</div>
     <div class="modal-buttons">
-      <button class="modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-      <button class="modal-btn-confirm" id="modal-confirm-btn" onclick="executeDelete()">Delete Permanently</button>
+      <button class="modal-btn-cancel" onclick="closeDeleteModal()">{{ t('common.cancel') }}</button>
+      <button class="modal-btn-confirm" id="modal-confirm-btn" onclick="executeDelete()">{{ t('backups.modal.confirm') }}</button>
     </div>
   </div>
 </div>
@@ -468,7 +470,7 @@
 <!-- Toast notification box -->
 <div class="toast" id="toast-box">
   <span id="toast-icon">✓</span>
-  <span id="toast-message">Action completed successfully</span>
+  <span id="toast-message">{{ t('common.action_completed') }}</span>
 </div>
 
 <script>
@@ -491,11 +493,11 @@ async function loadBackups() {
   const wrapper = document.getElementById("table-wrapper");
   try {
     const res = await fetch("/api/backups");
-    if (!res.ok) throw new Error("HTTP error " + res.status);
+    if (!res.ok) throw new Error(t("common.http_error", { status: res.status }));
     const data = await res.json();
     
     if (data.error) {
-      showErrorToast("Error loading backups: " + data.error);
+      showErrorToast(t("backups.error.loading_backups", { error: data.error }));
       renderErrorState(data.error);
       return;
     }
@@ -507,7 +509,7 @@ async function loadBackups() {
     
     renderTable(data);
   } catch (err) {
-    showErrorToast("Connection error: " + err.message);
+    showErrorToast(t("backups.error.connection_error", { error: err.message }));
     renderErrorState(err.message);
   }
 }
@@ -523,11 +525,11 @@ function renderTable(backups) {
         <td class="filename">${b.filename}</td>
         <td class="file-size">${b.size_str}</td>
         <td style="white-space: nowrap;">
-          <a class="btn-action btn-download" href="/api/backups/${b.filename}/download" title="Download backup file">
-            <span style="font-size: 13px;">⬇️</span> Download
+          <a class="btn-action btn-download" href="/api/backups/${b.filename}/download" title="${t('backups.table.download_title')}">
+            <span style="font-size: 13px;">⬇️</span> ${t('backups.table.download')}
           </a>
-          <button class="btn-action btn-delete" onclick="confirmDelete('${b.filename}', this)" title="Delete backup file">
-            <span style="font-size: 13px;">🗑️</span> Delete
+          <button class="btn-action btn-delete" onclick="confirmDelete('${b.filename}', this)" title="${t('backups.table.delete_title')}">
+            <span style="font-size: 13px;">🗑️</span> ${t('backups.table.delete')}
           </button>
         </td>
       </tr>
@@ -539,11 +541,11 @@ function renderTable(backups) {
       <table>
         <thead>
           <tr>
-            <th style="width: 15%">Switch IP</th>
-            <th style="width: 20%">Date & Time</th>
-            <th style="width: 40%">Filename</th>
-            <th style="width: 10%">Size</th>
-            <th style="width: 15%">Actions</th>
+            <th style="width: 15%">${t('backups.table.switch_ip')}</th>
+            <th style="width: 20%">${t('backups.table.datetime')}</th>
+            <th style="width: 40%">${t('backups.table.filename')}</th>
+            <th style="width: 10%">${t('backups.table.size')}</th>
+            <th style="width: 15%">${t('backups.table.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -559,9 +561,9 @@ function renderEmptyState() {
   wrapper.innerHTML = `
     <div class="empty-state">
       <div class="empty-icon">📂</div>
-      <h3>No backups archived</h3>
-      <p>Configure your switches in the settings and press the "💾 Backup" action next to any switch IP in the main dashboard to store automated binary backups here.</p>
-      <a href="/" style="margin-top: 8px;">&larr; Go to Dashboard</a>
+      <h3>${t('backups.empty.title')}</h3>
+      <p>${t('backups.empty.desc')}</p>
+      <a href="/" style="margin-top: 8px;">&larr; ${t('backups.empty.go_dashboard')}</a>
     </div>
   `;
 }
@@ -571,10 +573,10 @@ function renderErrorState(msg) {
   wrapper.innerHTML = `
     <div class="empty-state" style="color: #ff7b72;">
       <div class="empty-icon">⚠️</div>
-      <h3>System Error</h3>
+      <h3>${t('backups.error.system_error')}</h3>
       <p>${msg}</p>
       <button onclick="loadBackups()" class="btn-action btn-download" style="margin-top: 14px; padding: 10px 20px;">
-        🔄 Retry Connection
+        🔄 ${t('backups.error.retry_connection')}
       </button>
     </div>
   `;
@@ -599,7 +601,7 @@ async function executeDelete() {
   
   const confirmBtn = document.getElementById("modal-confirm-btn");
   confirmBtn.disabled = true;
-  confirmBtn.textContent = "Deleting...";
+  confirmBtn.textContent = t("backups.modal.deleting");
   
   try {
     const res = await fetch(`/api/backups/${encodeURIComponent(fileToDelete)}`, {
@@ -608,7 +610,7 @@ async function executeDelete() {
     const data = await res.json();
     
     if (res.ok && data.status === "ok") {
-      showSuccessToast("Backup deleted successfully");
+      showSuccessToast(t("backups.toast.deleted"));
       
       // Animate row deletion
       if (rowToDelete) {
@@ -623,13 +625,13 @@ async function executeDelete() {
         }, 400);
       }
     } else {
-      showErrorToast("Delete failed: " + (data.error || "Unknown error"));
+      showErrorToast(t("backups.error.delete_failed", { error: data.error || t("common.unknown_error") }));
     }
   } catch (err) {
-    showErrorToast("Error connecting to server: " + err.message);
+    showErrorToast(t("backups.error.server_connect", { error: err.message }));
   } finally {
     confirmBtn.disabled = false;
-    confirmBtn.textContent = "Delete Permanently";
+    confirmBtn.textContent = t("backups.modal.confirm");
     closeDeleteModal();
   }
 }

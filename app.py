@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 from collections import deque
 from flask import Flask, render_template, jsonify, request, redirect, url_for, Response, send_from_directory
 from datetime import datetime, timezone, timedelta
+from typing import Any
 
 BASE = os.path.dirname(__file__)
 DATA_DIR = os.environ.get("DASHBOARD_DATA_DIR", BASE)
@@ -17,6 +18,7 @@ NOTES_PATH = os.path.join(DATA_DIR, "notes.json")
 LOG_FILE_PATH = os.path.join(DATA_DIR, "logs", "dashboard.log")
 
 import scanner_db
+import i18n
 
 def setup_logging(level_name=None):
     if not level_name:
@@ -110,6 +112,61 @@ VENDORS_TXT_PATH = os.path.join(DATA_DIR, "mac_vendors.txt")
 OUI36_TXT_PATH = os.path.join(DATA_DIR, "oui36.txt")
 OUI_TXT_PATH = os.path.join(DATA_DIR, "oui.txt")
 VERSION = "2026.7.1"
+
+
+def get_configured_language() -> str:
+    """설정 파일에 저장된 전역 언어 설정값을 반환한다.
+
+    Returns:
+        저장된 언어 코드 또는 기본 자동 감지 값(`auto`).
+    """
+    value = config.get("language", i18n.AUTO_LANGUAGE)
+    if isinstance(value, str) and i18n.is_valid_language_setting(value):
+        return value.strip().lower()
+    return i18n.AUTO_LANGUAGE
+
+
+def get_current_language() -> str:
+    """현재 HTTP 요청에 적용할 실제 언어 코드를 해석한다.
+
+    Returns:
+        활성 언어 코드(예: `ko`, `en`).
+    """
+    from flask import has_request_context
+    accept_lang = request.headers.get("Accept-Language", "") if has_request_context() else None
+    return i18n.resolve_language(get_configured_language(), accept_lang)
+
+
+def t(key: str, **kwargs: Any) -> str:
+    """현재 요청의 활성 언어로 번역 문자열을 조회한다.
+
+    Args:
+        key: 점 표기법 번역 키.
+        **kwargs: 플레이스홀더 치환 인자.
+
+    Returns:
+        번역된 문자열.
+    """
+    return i18n.translate(key, lang=get_current_language(), **kwargs)
+
+
+@app.context_processor
+def inject_i18n() -> dict[str, Any]:
+    """모든 Jinja2 템플릿에 다국어 컨텍스트와 번역 헬퍼를 주입한다.
+
+    Returns:
+        언어 코드, 로케일, 번역 함수, 클라이언트용 JSON 번들을 담은 딕셔너리.
+    """
+    active_lang = get_current_language()
+    bundle = i18n.get_client_bundle(active_lang)
+    return {
+        "lang": active_lang,
+        "locale": i18n.get_locale(active_lang),
+        "configured_language": get_configured_language(),
+        "available_languages": i18n.get_available_languages(),
+        "t": lambda key, **kw: i18n.translate(key, lang=active_lang, **kw),
+        "i18n_json": i18n.serialize_for_script(bundle),
+    }
 
 
 
@@ -1295,7 +1352,7 @@ def refresh_mac(ip):
             sw = s
             break
     if not sw:
-        return jsonify({"error": "Switch not found"}), 404
+        return jsonify({"error": t("api.switch_not_found")}), 404
         
     if sw.get("model", "").lower() == "internet":
         return jsonify({"status": "ok", "count": 0, "mac_table": []})
@@ -1337,10 +1394,10 @@ def get_transceiver(ip):
             sw = s
             break
     if not sw:
-        return jsonify({"error": "Switch not found"}), 404
+        return jsonify({"error": t("api.switch_not_found")}), 404
         
     if sw.get("model", "").lower() == "internet":
-        return jsonify({"error": "No transceiver data available for virtual Internet node"}), 404
+        return jsonify({"error": t("api.transceiver_virtual_internet")}), 404
         
     try:
         from scraper import HCSwitchScraper, OVSScraper, FritzBoxScraper
@@ -1354,7 +1411,7 @@ def get_transceiver(ip):
         transceiver_info = scraper_obj.scrape_transceiver()
 
         if not transceiver_info:
-            return jsonify({"error": "No transceiver data available or SFP module not inserted"}), 404
+            return jsonify({"error": t("api.transceiver_not_available")}), 404
         return jsonify(transceiver_info)
 
     except Exception as e:
@@ -1975,7 +2032,7 @@ def api_history():
     range_type = request.args.get("range", "live")  # live, 1h, 24h
     
     if not ip or not port:
-        return jsonify({"error": "Missing ip or port"}), 400
+        return jsonify({"error": t("api.missing_ip_or_port")}), 400
         
     key = (ip, port)
     tx = []
@@ -2041,7 +2098,7 @@ def api_notes():
     key = data.get("key")
     note = data.get("note", "")
     if not key:
-        return jsonify({"error": "missing key"}), 400
+        return jsonify({"error": t("api.missing_key")}), 400
     with NOTES_LOCK:
         notes = load_notes()
         if note.strip():
@@ -2066,7 +2123,7 @@ def list_templates():
 @app.route("/api/templates/<filename>", methods=["GET", "POST"])
 def manage_template(filename):
     if ".." in filename or "/" in filename or "\\" in filename or not filename.endswith(".yaml"):
-        return jsonify({"error": "Invalid filename"}), 400
+        return jsonify({"error": t("api.invalid_filename")}), 400
 
     filepath = os.path.join(DEVICE_TEMPLATES_DIR, filename)
 
@@ -2074,12 +2131,12 @@ def manage_template(filename):
         data = request.get_json(force=True, silent=True) or {}
         content = data.get("content", "")
         if not content.strip():
-            return jsonify({"error": "Content cannot be empty"}), 400
+            return jsonify({"error": t("api.content_empty")}), 400
         try:
             import yaml
             yaml.safe_load(content)
         except Exception as ye:
-            return jsonify({"error": f"Invalid YAML Syntax: {ye}"}), 400
+            return jsonify({"error": t("api.invalid_yaml_syntax", error=ye)}), 400
 
         try:
             with open(filepath, "w", encoding="utf-8") as f:
@@ -2092,7 +2149,7 @@ def manage_template(filename):
 
     # GET method
     if not os.path.exists(filepath):
-        return jsonify({"error": "Template not found"}), 404
+        return jsonify({"error": t("api.template_not_found")}), 404
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
@@ -2187,6 +2244,9 @@ def config_page():
                 })
 
         new_title = request.form.get("title", config.get("title", ""))
+        new_language = request.form.get("language", i18n.AUTO_LANGUAGE).strip().lower()
+        if not i18n.is_valid_language_setting(new_language):
+            new_language = i18n.AUTO_LANGUAGE
         new_refresh = int(request.form.get("refresh_interval", 30))
         new_mac_multiplier = int(request.form.get("mac_refresh_multiplier", 5))
         new_ports_wrap_threshold = int(request.form.get("ports_wrap_threshold", 0))
@@ -2201,6 +2261,7 @@ def config_page():
 
         load_config()
         config["title"] = new_title
+        config["language"] = new_language
         config["refresh_interval"] = new_refresh
         config["mac_refresh_multiplier"] = new_mac_multiplier
         config["ports_wrap_threshold"] = new_ports_wrap_threshold
@@ -2270,6 +2331,7 @@ def config_page():
                            scanner_port_scan_threads=config.get("scanner_port_scan_threads", 20),
                            scanner_host_scan_threads=config.get("scanner_host_scan_threads", 4),
                            scanner_port_scan_timeout_ms=config.get("scanner_port_scan_timeout_ms", 500),
+                           language=get_configured_language(),
                            version=VERSION,
                            telemetry_enabled=config.get("telemetry_enabled", True))
 
@@ -2282,7 +2344,11 @@ def api_settings():
         if "settings" not in config:
             config["settings"] = {}
         for k, v in data.items():
-            if k.startswith("scanner_"):
+            if k == "language":
+                lang_val = str(v).strip().lower()
+                if i18n.is_valid_language_setting(lang_val):
+                    config["language"] = lang_val
+            elif k.startswith("scanner_"):
                 config[k] = v
             else:
                 config["settings"][k] = v
@@ -2291,6 +2357,7 @@ def api_settings():
     
     # GET method
     res = dict(config.get("settings", {}))
+    res["language"] = get_configured_language()
     for k in ["scanner_enabled", "scanner_network_range", "scanner_port_scan_enabled", 
               "scanner_port_scan_range", "scanner_interval", "scanner_port_scan_interval", 
               "scanner_purge_history_hours", "scanner_port_scan_threads", 
@@ -2327,7 +2394,7 @@ def api_clients_update_host():
     mac = data.get("mac", "").replace(":", "").replace("-", "").replace(" ", "").upper()
     host = data.get("host", "").strip()
     if not mac:
-        return jsonify({"error": "Missing mac"}), 400
+        return jsonify({"error": t("api.missing_mac")}), 400
         
     load_config()
     db_clients = config.get("clients", {})
@@ -2358,7 +2425,7 @@ def api_clients_update_type():
     mac = data.get("mac", "").replace(":", "").replace("-", "").replace(" ", "").upper()
     device_type = data.get("type", "").strip()
     if not mac:
-        return jsonify({"error": "Missing mac"}), 400
+        return jsonify({"error": t("api.missing_mac")}), 400
         
     load_config()
     db_clients = config.get("clients", {})
@@ -2389,7 +2456,7 @@ def api_clients_delete():
     data = request.get_json(force=True, silent=True) or {}
     mac = data.get("mac", "").replace(":", "").replace("-", "").replace(" ", "").upper()
     if not mac:
-        return jsonify({"error": "Missing mac"}), 400
+        return jsonify({"error": t("api.missing_mac")}), 400
         
     load_config()
     db_clients = config.get("clients", {})
@@ -2414,12 +2481,12 @@ def api_clients_delete():
 @app.route("/api/clients/import_csv", methods=["POST"])
 def api_clients_import_csv():
     if "file" not in request.files:
-        return jsonify({"error": "No file part in the request"}), 400
+        return jsonify({"error": t("api.no_file_part")}), 400
     file = request.files["file"]
     if file.filename == "":
-        return jsonify({"error": "No file selected for uploading"}), 400
+        return jsonify({"error": t("api.no_file_selected")}), 400
     if not file.filename.endswith(".csv"):
-        return jsonify({"error": "Only CSV files are allowed"}), 400
+        return jsonify({"error": t("api.only_csv_allowed")}), 400
 
     try:
         content = file.read().decode("utf-8", errors="ignore")
@@ -2484,25 +2551,25 @@ def api_device_types_raw():
         data = request.get_json(force=True, silent=True) or {}
         content = data.get("content", "")
         if not content.strip():
-            return jsonify({"error": "Content cannot be empty"}), 400
+            return jsonify({"error": t("api.content_empty")}), 400
         try:
             import yaml
             parsed = yaml.safe_load(content)
             if not isinstance(parsed, dict):
-                return jsonify({"error": "YAML must be a key-value dictionary mapping type keys to labels and icons/paths."}), 400
+                return jsonify({"error": t("api.device_types_dict_required")}), 400
             for k, v in parsed.items():
                 if not isinstance(v, dict) or "label" not in v:
-                    return jsonify({"error": f"Entry '{k}' must contain a 'label' key."}), 400
+                    return jsonify({"error": t("api.device_types_missing_label", key=k)}), 400
                 if "icon" not in v and "path" not in v:
-                    return jsonify({"error": f"Entry '{k}' must contain either 'icon' or 'path' key."}), 400
+                    return jsonify({"error": t("api.device_types_missing_icon_or_path", key=k)}), 400
                 if not isinstance(v.get("label"), str):
-                    return jsonify({"error": f"Field 'label' for entry '{k}' must be a string."}), 400
+                    return jsonify({"error": t("api.device_types_label_str", key=k)}), 400
                 if "icon" in v and not isinstance(v.get("icon"), str):
-                    return jsonify({"error": f"Field 'icon' for entry '{k}' must be a string."}), 400
+                    return jsonify({"error": t("api.device_types_icon_str", key=k)}), 400
                 if "path" in v and not isinstance(v.get("path"), str):
-                    return jsonify({"error": f"Field 'path' for entry '{k}' must be a string."}), 400
+                    return jsonify({"error": t("api.device_types_path_str", key=k)}), 400
         except Exception as ye:
-            return jsonify({"error": f"Invalid YAML Syntax: {ye}"}), 400
+            return jsonify({"error": t("api.invalid_yaml_syntax", error=ye)}), 400
 
         try:
             with open(DEVICE_TYPES_YAML_PATH, "w", encoding="utf-8") as f:
@@ -2583,9 +2650,9 @@ def update_oui_api():
         success_36 = download_single_oui_file("https://standards-oui.ieee.org/oui36/oui36.txt", OUI36_TXT_PATH)
         success_24 = download_single_oui_file("https://standards-oui.ieee.org/oui/oui.txt", OUI_TXT_PATH)
         if success_36 and success_24:
-            return jsonify({"status": "ok", "message": "IEEE OUI databases successfully updated."})
+            return jsonify({"status": "ok", "message": t("api.oui_updated")})
         else:
-            return jsonify({"status": "error", "message": "Failed to download one or both OUI files. Check server logs."}), 500
+            return jsonify({"status": "error", "message": t("api.oui_download_failed")}), 500
     except Exception as e:
         logger.error(f"Manual OUI update failed: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -2605,17 +2672,17 @@ def backup_switch_config(ip):
             sw = s
             break
     if not sw:
-        return jsonify({"error": "Switch not found"}), 404
+        return jsonify({"error": t("api.switch_not_found")}), 404
 
     if sw.get("model", "").lower() == "internet":
-        return jsonify({"error": "Virtual Internet node cannot be backed up"}), 400
+        return jsonify({"error": t("api.backup_virtual_internet")}), 400
 
     try:
         from scraper import HCSwitchScraper
         scraper_obj = HCSwitchScraper(sw)
         binary_data = scraper_obj.download_backup()
         if not binary_data:
-            return jsonify({"error": "No backup data retrieved from switch"}), 500
+            return jsonify({"error": t("api.backup_no_data")}), 500
 
         backup_dir = BACKUP_DIR
         os.makedirs(backup_dir, exist_ok=True)
@@ -2648,16 +2715,16 @@ def reboot_switch_api(ip):
             sw = s
             break
     if not sw:
-        return jsonify({"error": "Switch not found"}), 404
+        return jsonify({"error": t("api.switch_not_found")}), 404
 
     if sw.get("model", "").lower() == "internet":
-        return jsonify({"error": "Virtual Internet node cannot be rebooted"}), 400
+        return jsonify({"error": t("api.reboot_virtual_internet")}), 400
 
     try:
         from scraper import HCSwitchScraper
         scraper_obj = HCSwitchScraper(sw)
         scraper_obj.reboot_switch()
-        return jsonify({"status": "ok", "message": "Reboot command sent successfully"})
+        return jsonify({"status": "ok", "message": t("api.reboot_sent")})
     except Exception as e:
         logger.error(f"Reboot failed for {ip}: {e}")
         return jsonify({"error": str(e)}), 500
@@ -2716,12 +2783,12 @@ def get_backups():
 @app.route("/api/backups/<filename>/download")
 def download_backup_file(filename):
     if ".." in filename or "/" in filename or "\\" in filename:
-        return jsonify({"error": "Invalid filename"}), 400
+        return jsonify({"error": t("api.invalid_filename")}), 400
 
     backup_dir = BACKUP_DIR
     filepath = os.path.join(backup_dir, filename)
     if not os.path.exists(filepath) or not os.path.isfile(filepath):
-        return jsonify({"error": "File not found"}), 404
+        return jsonify({"error": t("api.file_not_found")}), 404
 
     return send_from_directory(backup_dir, filename, as_attachment=True)
 
@@ -2729,12 +2796,12 @@ def download_backup_file(filename):
 @app.route("/api/backups/<filename>", methods=["DELETE"])
 def delete_backup_file(filename):
     if ".." in filename or "/" in filename or "\\" in filename:
-        return jsonify({"error": "Invalid filename"}), 400
+        return jsonify({"error": t("api.invalid_filename")}), 400
 
     backup_dir = BACKUP_DIR
     filepath = os.path.join(backup_dir, filename)
     if not os.path.exists(filepath) or not os.path.isfile(filepath):
-        return jsonify({"error": "File not found"}), 404
+        return jsonify({"error": t("api.file_not_found")}), 404
 
     try:
         os.remove(filepath)
@@ -2790,7 +2857,7 @@ def api_logs_level():
     level_name = data.get("level", "INFO").upper()
     valid_levels = ["DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL", "NONE"]
     if level_name not in valid_levels:
-        return jsonify({"error": "Invalid log level"}), 400
+        return jsonify({"error": t("api.invalid_log_level")}), 400
 
     try:
         load_config()
@@ -2826,7 +2893,7 @@ def api_logs_download():
             with open(LOG_FILE_PATH, "w", encoding="utf-8") as f:
                 pass
         except Exception:
-            return jsonify({"error": "Log file not found"}), 404
+            return jsonify({"error": t("api.log_file_not_found")}), 404
             
     dir_name = os.path.dirname(LOG_FILE_PATH)
     file_name = os.path.basename(LOG_FILE_PATH)
@@ -2956,7 +3023,7 @@ def api_scanner_known(ip_address):
             config["clients"][mac_clean] = client
             save_config()
             return jsonify({"success": True})
-    return jsonify({"error": "Host not found"}), 404
+    return jsonify({"error": t("api.host_not_found")}), 404
 
 
 @app.route("/api/scanner/hosts/<ip_address>/update", methods=["POST"])
@@ -2966,7 +3033,7 @@ def api_scanner_update_host(ip_address):
     field = data.get("field")
     value = data.get("value", "")
     if field not in ["hostname", "note"]:
-        return jsonify({"error": "Field not updatable"}), 400
+        return jsonify({"error": t("api.field_not_updatable")}), 400
         
     with config_lock:
         mac_clean, client = find_client_by_ip(ip_address)
@@ -2979,7 +3046,7 @@ def api_scanner_update_host(ip_address):
             config["clients"][mac_clean] = client
             save_config()
             return jsonify({"success": True})
-    return jsonify({"error": "Host not found"}), 404
+    return jsonify({"error": t("api.host_not_found")}), 404
 
 
 @app.route("/api/scanner/hosts/<ip_address>", methods=["DELETE"])
@@ -2995,7 +3062,7 @@ def api_scanner_delete_host(ip_address):
                 config["clients"].pop(mac_clean, None)
             save_config()
             return jsonify({"success": True})
-    return jsonify({"error": "Host not found"}), 404
+    return jsonify({"error": t("api.host_not_found")}), 404
 
 
 @app.route("/api/scanner/history")

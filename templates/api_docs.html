@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ title }} - API Reference</title>
+  <title>{{ title }} - {{ t('api_docs.page_title') }}</title>
+  <script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+  <script src="/static/i18n.js"></script>
   <link rel="icon" href="/static/logo.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +19,7 @@
     body {
       background: #0d1117;
       color: #c9d1d9;
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
       line-height: 1.6;
       overflow-x: hidden;
     }
@@ -364,16 +366,16 @@
   <!-- Header -->
   <div class="header">
     <div class="header-brand">
-      <img src="/static/logo.png" alt="Horaco Logo" class="header-logo">
-      <h1>{{ title }} &middot; API Docs <span class="version-badge" style="background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-weight: 600; vertical-align: middle; margin-left: 6px;">v{{ version }}</span></h1>
+      <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" class="header-logo">
+      <h1>{{ title }} &middot; {{ t('api_docs.header_suffix') }} <span class="version-badge" style="background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-weight: 600; vertical-align: middle; margin-left: 6px;">v{{ version }}</span></h1>
     </div>
     <div class="nav-links">
-      <a href="/">📊 Dashboard</a>
-      <a href="/map">🕸️ Network Map</a>
-      <a href="/scanner">🌐 Scanner</a>
-      <a href="/config">&#9881; Config</a>
-      <a href="/backups">💾 Backups</a>
-      <a href="/logs">📋 Logs</a>
+      <a href="/">📊 {{ t('nav.dashboard') }}</a>
+      <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+      <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+      <a href="/config">&#9881; {{ t('nav.config') }}</a>
+      <a href="/backups">💾 {{ t('nav.backups') }}</a>
+      <a href="/logs">📋 {{ t('nav.logs') }}</a>
     </div>
   </div>
 
@@ -382,7 +384,7 @@
     
     <!-- Navigation Sidebar -->
     <div class="sidebar">
-      <div class="sidebar-section-title">REST API Endpoints</div>
+      <div class="sidebar-section-title">{{ t('api_docs.sidebar.rest_endpoints') }}</div>
       <ul class="sidebar-list">
         <li class="sidebar-item">
           <a href="#switches" class="sidebar-link active" onclick="setActiveLink(this)">
@@ -476,7 +478,7 @@
         </li>
 
         <!-- Network Scanner APIs -->
-        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">Scanner APIs</li>
+        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">{{ t('api_docs.sidebar.scanner_apis') }}</li>
         <li class="sidebar-item">
           <a href="#scanner-hosts" class="sidebar-link" onclick="setActiveLink(this)">
             <span class="badge badge-get">GET</span>
@@ -521,7 +523,7 @@
         </li>
 
         <!-- Topology & Extra Monitor APIs -->
-        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">Topology & Extras</li>
+        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">{{ t('api_docs.sidebar.topology_extras') }}</li>
         <li class="sidebar-item">
           <a href="#topology" class="sidebar-link" onclick="setActiveLink(this)">
             <span class="badge badge-get">GET</span>
@@ -536,7 +538,7 @@
         </li>
 
         <!-- Clients & Templates APIs -->
-        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">Clients & Templates</li>
+        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">{{ t('api_docs.sidebar.clients_templates') }}</li>
         <li class="sidebar-item">
           <a href="#clients-update" class="sidebar-link" onclick="setActiveLink(this)">
             <span class="badge badge-post">POST</span>
@@ -557,7 +559,7 @@
         </li>
 
         <!-- Logs APIs -->
-        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">System Logs</li>
+        <li class="sidebar-item-header" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #8b949e; margin: 12px 0 6px 8px; font-weight: 600;">{{ t('api_docs.sidebar.system_logs') }}</li>
         <li class="sidebar-item">
           <a href="#logs-list" class="sidebar-link" onclick="setActiveLink(this)">
             <span class="badge badge-get">GET</span>
@@ -589,8 +591,8 @@
     <div class="content-area">
       
       <div class="doc-intro">
-        <h2>Dashboard REST API Documentation</h2>
-        <p>A reference guide to the HTTP endpoints built into the Switch Dashboard. All programmatic access runs through the local Flask server layer on port 8080.</p>
+        <h2>{{ t('api_docs.intro.title') }}</h2>
+        <p>{{ t('api_docs.intro.desc') }}</p>
       </div>
 
       <!-- GET /api/switches -->
@@ -598,15 +600,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/switches</span>
-          <span class="api-title">Live Status of All Switches</span>
+          <span class="api-title">{{ t('api_docs.endpoints.switches_title') }}</span>
         </div>
-        <p class="api-desc">Retrieves a full, live status report of all managed switches. This includes system-level parameters (Uptime, Firmware, MAC) and individual port configuration metrics.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.switches_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>[
   {
     "name": "Switch 1",
@@ -639,35 +641,35 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/switches/&lt;ip&gt;/transceiver</span>
-          <span class="api-title">SFP Transceiver Metrics & DDMI Diagnostics</span>
+          <span class="api-title">{{ t('api_docs.endpoints.transceiver_title') }}</span>
         </div>
-        <p class="api-desc">Scrapes physical optical transceiver diagnostic metrics for the switch target at the given IP. Returns standard SFP specs alongside real-time DDMI sensors.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.transceiver_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The IP address of the target switch.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.transceiver_param_ip') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "bitrate": "10G",
   "connector_type": "LC",
@@ -702,35 +704,35 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/switches/&lt;ip&gt;/refresh_mac</span>
-          <span class="api-title">Force Scrape MAC Forwarding Table</span>
+          <span class="api-title">{{ t('api_docs.endpoints.refresh_mac_title') }}</span>
         </div>
-        <p class="api-desc">Triggers an on-demand scraper thread to log into the target switch, paginate the physical MAC Forwarding table, and return a clean array of resolved bridge entries.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.refresh_mac_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The IP address of the target switch.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.transceiver_param_ip') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>[
   {
     "mac": "bc:24:11:22:33:44",
@@ -753,15 +755,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/speeds</span>
-          <span class="api-title">Real-Time Port Traffic Speeds</span>
+          <span class="api-title">{{ t('api_docs.endpoints.speeds_title') }}</span>
         </div>
-        <p class="api-desc">Retrieves instantaneous delta speed rates (traffic rate in bytes per second and packets per second) for all switches and ports since the previous scrape interval.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.speeds_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "192.168.1.100": {
     "1": {
@@ -786,47 +788,47 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/history</span>
-          <span class="api-title">Bandwidth Graph History Data</span>
+          <span class="api-title">{{ t('api_docs.endpoints.history_title') }}</span>
         </div>
-        <p class="api-desc">Retrieves historical data arrays for populating bandwidth charts. Ideal for mapping out transmission graphs over time.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.history_desc') }}</p>
         
-        <div class="param-title">Query Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.query_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Target switch IP.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.history_param_ip') }}</td>
             </tr>
             <tr>
               <td class="param-name">port</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Target switch port number.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.history_param_port') }}</td>
             </tr>
             <tr>
               <td class="param-name">range</td>
               <td class="param-type">string</td>
-              <td><span class="param-opt">Optional</span></td>
-              <td>History scale. Options: <code>live</code> (default, bits/s), <code>1h</code> (Bytes/s), or <code>24h</code> (Bytes/s).</td>
+              <td><span class="param-opt">{{ t('api_docs.common.optional') }}</span></td>
+              <td>{{ t('api_docs.endpoints.history_param_range_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "timestamps": [1716280000, 1716280010, 1716280020],
   "tx": [125000, 142000, 138000],
@@ -840,41 +842,41 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/notes</span>
-          <span class="api-title">Save Custom Port Note/Label</span>
+          <span class="api-title">{{ t('api_docs.endpoints.notes_title') }}</span>
         </div>
-        <p class="api-desc">Appends a persistent description or note to a specific switch interface. Comments are stored on the server's local disk inside <code>notes.json</code>.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.notes_desc_html')|safe }}</p>
         
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">key</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Identifier in <code>ip_address:port_num</code> format (e.g. <code>"192.168.1.100:9"</code>).</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.notes_param_key_html')|safe }}</td>
             </tr>
             <tr>
               <td class="param-name">val</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Text content of the note. Pass an empty string <code>""</code> to delete notes.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.notes_param_val_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Request Payload</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.request_payload') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "key": "192.168.1.100:9",
   "val": "Backbone Server Rack Uplink"
@@ -887,15 +889,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/settings</span>
-          <span class="api-title">Retrieve Global System Settings</span>
+          <span class="api-title">{{ t('api_docs.endpoints.get_settings_title') }}</span>
         </div>
-        <p class="api-desc">Retrieves global dashboard settings currently stored in the backend.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.get_settings_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "refresh": 10
 }</code></pre>
@@ -907,35 +909,35 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/settings</span>
-          <span class="api-title">Update Global System Settings</span>
+          <span class="api-title">{{ t('api_docs.endpoints.post_settings_title') }}</span>
         </div>
-        <p class="api-desc">Updates global settings in the dashboard environment, immediately adjusting background cycles.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.post_settings_desc') }}</p>
         
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">refresh</td>
               <td class="param-type">integer</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Polling interval in seconds. Minimum value is <code>5</code>.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.post_settings_param_refresh_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Request Payload</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.request_payload') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "refresh": 15
 }</code></pre>
@@ -947,15 +949,15 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/reset</span>
-          <span class="api-title">Reset Counters & Charts</span>
+          <span class="api-title">{{ t('api_docs.endpoints.reset_title') }}</span>
         </div>
-        <p class="api-desc">Purges temporary memory caching logs and charts, forcing a re-alignment of base traffic stats.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.reset_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "status": "ok"
 }</code></pre>
@@ -967,35 +969,35 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/switches/&lt;ip&gt;/backup</span>
-          <span class="api-title">Trigger Switch Configuration Backup</span>
+          <span class="api-title">{{ t('api_docs.endpoints.backup_trigger_title') }}</span>
         </div>
-        <p class="api-desc">Logs into the switch at the given IP address, triggers an on-demand download of the binary configuration file from the switch CGI interface, and saves it in the server's local file archive.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.backup_trigger_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The IP address of the target switch.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.transceiver_param_ip') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "filename": "switch_cfg_192-168-1-100_20260521_1519.bin",
   "size": 2708,
@@ -1010,35 +1012,35 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/switches/&lt;ip&gt;/reboot</span>
-          <span class="api-title">Trigger Switch Reboot</span>
+          <span class="api-title">{{ t('api_docs.endpoints.reboot_trigger_title') }}</span>
         </div>
-        <p class="api-desc">Triggers an on-demand reboot of the target switch. The device will perform a soft reset immediately, which will temporarily disrupt connectivity on that switch.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.reboot_trigger_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The IP address of the target switch.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.transceiver_param_ip') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "message": "Reboot command sent successfully",
   "status": "ok"
@@ -1051,15 +1053,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/backups</span>
-          <span class="api-title">List Configuration Backups</span>
+          <span class="api-title">{{ t('api_docs.endpoints.backups_list_title') }}</span>
         </div>
-        <p class="api-desc">Scans the server backup directory and returns a sorted list of all archived configuration files including switch IP, timestamp, human-readable file size, and exact filename metadata.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.backups_list_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>[
   {
     "datetime": "2026-05-21 15:19",
@@ -1078,36 +1080,36 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/backups/&lt;filename&gt;/download</span>
-          <span class="api-title">Download Backup File</span>
+          <span class="api-title">{{ t('api_docs.endpoints.backup_download_title') }}</span>
         </div>
-        <p class="api-desc">Downloads a specific archived configuration backup file from the server's local storage. This endpoint includes directory traversal protection to block unauthorized path accesses.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.backup_download_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">filename</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The target backup filename, e.g. <code>switch_cfg_192-168-1-100_20260521_1519.bin</code>.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.backup_download_param_filename_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response Format</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_format') }}</span>
         </div>
         <div class="code-container">
           <button class="copy-btn" style="display:none;"></button>
-          <pre><code>Binary Stream (application/octet-stream attachment)</code></pre>
+          <pre><code>{{ t('api_docs.endpoints.backup_download_format') }}</code></pre>
         </div>
       </div>
 
@@ -1116,35 +1118,35 @@
         <div class="api-card-header">
           <span class="badge badge-delete">DELETE</span>
           <span class="api-route">/api/backups/&lt;filename&gt;</span>
-          <span class="api-title">Delete Backup File</span>
+          <span class="api-title">{{ t('api_docs.endpoints.backup_delete_title') }}</span>
         </div>
-        <p class="api-desc">Permanently purges a specific configuration backup file from the server storage disk. Includes strict path verification to prevent directory traversal exploits.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.backup_delete_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">filename</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The target backup filename to delete.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.backup_delete_param_filename') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "status": "ok"
 }</code></pre>
@@ -1156,15 +1158,15 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/vendors/update_oui</span>
-          <span class="api-title">Update IEEE OUI Databases</span>
+          <span class="api-title">{{ t('api_docs.endpoints.update_oui_title') }}</span>
         </div>
-        <p class="api-desc">Triggers an on-demand download of the official IEEE OUI registration databases (<code>oui.txt</code> and <code>oui36.txt</code>) to resolve MAC addresses to manufacturers. Requires internet connection to IEEE servers. Note that IEEE limits queries to one download per day.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.update_oui_desc_html')|safe }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "message": "IEEE OUI databases successfully updated.",
   "status": "ok"
@@ -1177,15 +1179,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/scanner/hosts</span>
-          <span class="api-title">List Scanned Network Hosts</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_hosts_title') }}</span>
         </div>
-        <p class="api-desc">Retrieves a list of all client devices detected by the background network discovery scanner, including IP address, MAC address, manufacturer vendor, switch port mapping, first/last seen timestamps, and known status.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_hosts_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>[
   {
     "ip_address": "192.168.1.15",
@@ -1209,55 +1211,55 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/scanner/hosts/&lt;mac&gt;/known</span>
-          <span class="api-title">Update Known Host Status</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_known_title') }}</span>
         </div>
-        <p class="api-desc">Toggles the "Known Device" flag for a scanned host identified by its MAC address (or IP address fallback).</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_known_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">mac</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Target client's MAC address (or IP address).</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_known_param_mac') }}</td>
             </tr>
           </tbody>
         </table>
 
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">known</td>
               <td class="param-type">integer</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Set to <code>1</code> for known, or <code>0</code> for unknown.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_known_param_known_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "success": true
 }</code></pre>
@@ -1269,61 +1271,61 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/scanner/hosts/&lt;mac&gt;/update</span>
-          <span class="api-title">Rename Host or Update Note</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_update_title') }}</span>
         </div>
-        <p class="api-desc">Modifies the custom hostname or descriptive note for a scanned client device in the configurations.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_update_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">mac</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Target client's MAC address (or IP address).</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_known_param_mac') }}</td>
             </tr>
           </tbody>
         </table>
 
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">field</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Target field to edit. Must be either <code>"hostname"</code> or <code>"note"</code>.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_update_param_field_html')|safe }}</td>
             </tr>
             <tr>
               <td class="param-name">value</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The new text value. Note that hostname mappings are updated accordingly.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_update_param_value') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "success": true
 }</code></pre>
@@ -1335,35 +1337,35 @@
         <div class="api-card-header">
           <span class="badge badge-delete">DELETE</span>
           <span class="api-route">/api/scanner/hosts/&lt;mac&gt;</span>
-          <span class="api-title">Remove Scanned Host</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_delete_title') }}</span>
         </div>
-        <p class="api-desc">Permanently removes a dynamically scanned host from the active dashboard database. If the host is mapped to a switch port, its scanner active state is disabled.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_delete_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">mac</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Target client's MAC address (or IP address).</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_known_param_mac') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "success": true
 }</code></pre>
@@ -1375,15 +1377,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/scanner/history</span>
-          <span class="api-title">Get Connection Timelines</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_history_list_title') }}</span>
         </div>
-        <p class="api-desc">Retrieves all network status transitions (online/offline transitions) grouped by host, extracted from the SQLite connection history database.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_history_list_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "192.168.1.15": {
     "hostname": "SmartTV",
@@ -1407,35 +1409,35 @@
         <div class="api-card-header">
           <span class="badge badge-delete">DELETE</span>
           <span class="api-route">/api/scanner/history/&lt;ip&gt;</span>
-          <span class="api-title">Delete Host Timeline History</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_history_delete_title') }}</span>
         </div>
-        <p class="api-desc">Permanently purges connection history logs for a specific host from the SQLite database.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_history_delete_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The IP address (or MAC address) of the client.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.scanner_history_delete_param_ip') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "success": true
 }</code></pre>
@@ -1447,15 +1449,15 @@
         <div class="api-card-header">
           <span class="badge badge-delete">DELETE</span>
           <span class="api-route">/api/scanner/history/all</span>
-          <span class="api-title">Purge All Scanner History</span>
+          <span class="api-title">{{ t('api_docs.endpoints.scanner_history_clear_title') }}</span>
         </div>
-        <p class="api-desc">Wipes out the entire connection timeline transition log database for all hosts. This action is irreversible.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.scanner_history_clear_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "success": true
 }</code></pre>
@@ -1467,15 +1469,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/topology</span>
-          <span class="api-title">Network Topology Map Graph</span>
+          <span class="api-title">{{ t('api_docs.endpoints.topology_title') }}</span>
         </div>
-        <p class="api-desc">Generates node adjacency list and port connection links for managed switches and resolved client devices, feeding the interactive network map.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.topology_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "nodes": [
     {
@@ -1505,35 +1507,35 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/switches/&lt;ip&gt;/image</span>
-          <span class="api-title">Switch Hardware Layout Image</span>
+          <span class="api-title">{{ t('api_docs.endpoints.switch_image_title') }}</span>
         </div>
-        <p class="api-desc">Dynamically retrieves the physical SVG/PNG image rendering depicting switch port links, speeds, and activity for the device at the given IP.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.switch_image_desc') }}</p>
         
-        <div class="param-title">Path Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.path_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">ip</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The IP address of the switch.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.switch_image_param_ip') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response Format</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_format') }}</span>
         </div>
         <div class="code-container">
-          <pre><code>Image Binary Stream (image/png or image/svg+xml)</code></pre>
+          <pre><code>{{ t('api_docs.endpoints.switch_image_format') }}</code></pre>
         </div>
       </div>
 
@@ -1542,47 +1544,47 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/clients/update_host</span>
-          <span class="api-title">Update Client Metadata</span>
+          <span class="api-title">{{ t('api_docs.endpoints.clients_update_title') }}</span>
         </div>
-        <p class="api-desc">Updates host descriptors, custom categories, or static configuration settings for a client entry mapped to a switch port.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.clients_update_desc') }}</p>
         
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">mac</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Client MAC address.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.clients_update_param_mac') }}</td>
             </tr>
             <tr>
               <td class="param-name">host</td>
               <td class="param-type">string</td>
-              <td><span class="param-opt">Optional</span></td>
-              <td>New hostname label.</td>
+              <td><span class="param-opt">{{ t('api_docs.common.optional') }}</span></td>
+              <td>{{ t('api_docs.endpoints.clients_update_param_host') }}</td>
             </tr>
             <tr>
               <td class="param-name">note</td>
               <td class="param-type">string</td>
-              <td><span class="param-opt">Optional</span></td>
-              <td>Custom notes text.</td>
+              <td><span class="param-opt">{{ t('api_docs.common.optional') }}</span></td>
+              <td>{{ t('api_docs.endpoints.clients_update_param_note') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "status": "ok"
 }</code></pre>
@@ -1594,35 +1596,35 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/clients/delete</span>
-          <span class="api-title">Delete Client Entry</span>
+          <span class="api-title">{{ t('api_docs.endpoints.clients_delete_title') }}</span>
         </div>
-        <p class="api-desc">Deletes a client record binding (by MAC address) from the active configuration registry.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.clients_delete_desc') }}</p>
         
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">mac</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>The target client MAC address.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.clients_delete_param_mac') }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "status": "ok"
 }</code></pre>
@@ -1634,15 +1636,15 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/templates</span>
-          <span class="api-title">List Config Templates</span>
+          <span class="api-title">{{ t('api_docs.endpoints.templates_list_title') }}</span>
         </div>
-        <p class="api-desc">Returns a list of device-specific scraper settings templates stored in the templates directory.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.templates_list_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>[
   "horaco_8port.yaml",
   "rui_default.yaml"
@@ -1655,35 +1657,35 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/logs</span>
-          <span class="api-title">Get System Logs</span>
+          <span class="api-title">{{ t('api_docs.endpoints.logs_list_title') }}</span>
         </div>
-        <p class="api-desc">Reads the active backend system logs and returns the tail output of the execution thread.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.logs_list_desc') }}</p>
         
-        <div class="param-title">Query Parameters</div>
+        <div class="param-title">{{ t('api_docs.common.query_parameters') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Parameter</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_parameter') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">lines</td>
               <td class="param-type">integer</td>
-              <td><span class="param-opt">Optional</span></td>
-              <td>Max lines to retrieve (default <code>100</code>).</td>
+              <td><span class="param-opt">{{ t('api_docs.common.optional') }}</span></td>
+              <td>{{ t('api_docs.endpoints.logs_list_param_lines_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>[
   "2026-06-11 14:02:11 - scraper - INFO - Starting background task",
   "2026-06-11 14:02:30 - app - INFO - API call /api/switches"
@@ -1696,35 +1698,35 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/logs/level</span>
-          <span class="api-title">Set Logging Level</span>
+          <span class="api-title">{{ t('api_docs.endpoints.logs_level_title') }}</span>
         </div>
-        <p class="api-desc">Updates backend logger verbosity levels dynamically without restarting the application thread.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.logs_level_desc') }}</p>
         
-        <div class="param-title">Request Payload (JSON)</div>
+        <div class="param-title">{{ t('api_docs.common.request_payload_json') }}</div>
         <table class="param-table">
           <thead>
             <tr>
-              <th>Key</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th>{{ t('api_docs.common.col_key') }}</th>
+              <th>{{ t('api_docs.common.col_type') }}</th>
+              <th>{{ t('api_docs.common.col_status') }}</th>
+              <th>{{ t('api_docs.common.col_description') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="param-name">level</td>
               <td class="param-type">string</td>
-              <td><span class="param-req">Required</span></td>
-              <td>Active logger filter: <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code>, or <code>NONE</code>.</td>
+              <td><span class="param-req">{{ t('api_docs.common.required') }}</span></td>
+              <td>{{ t('api_docs.endpoints.logs_level_param_level_html')|safe }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "status": "ok",
   "level": "DEBUG"
@@ -1737,15 +1739,15 @@
         <div class="api-card-header">
           <span class="badge badge-post">POST</span>
           <span class="api-route">/api/logs/clear</span>
-          <span class="api-title">Truncate Logs</span>
+          <span class="api-title">{{ t('api_docs.endpoints.logs_clear_title') }}</span>
         </div>
-        <p class="api-desc">Wipes the contents of the central execution log file stored on backend disk storage.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.logs_clear_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response JSON</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_json') }}</span>
         </div>
         <div class="code-container">
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <button class="copy-btn" onclick="copyCode(this)">{{ t('api_docs.common.copy') }}</button>
           <pre><code>{
   "status": "ok"
 }</code></pre>
@@ -1757,22 +1759,22 @@
         <div class="api-card-header">
           <span class="badge badge-get">GET</span>
           <span class="api-route">/api/logs/download</span>
-          <span class="api-title">Download Logs File</span>
+          <span class="api-title">{{ t('api_docs.endpoints.logs_download_title') }}</span>
         </div>
-        <p class="api-desc">Downloads the complete text log file from the server storage.</p>
+        <p class="api-desc">{{ t('api_docs.endpoints.logs_download_desc') }}</p>
         
         <div class="code-tabs">
-          <span class="code-tab-btn active">Response Format</span>
+          <span class="code-tab-btn active">{{ t('api_docs.common.response_format') }}</span>
         </div>
         <div class="code-container">
-          <pre><code>Plain Text File stream (attachment)</code></pre>
+          <pre><code>{{ t('api_docs.endpoints.logs_download_format') }}</code></pre>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="footer" style="text-align: center; margin-top: 40px; font-size: 12px; color: #8b949e; border-top: 1px solid #21262d; padding-top: 20px;">
-        <div><a href="/" style="color:#8b949e; text-decoration: none;">Back to Dashboard</a> &middot; <a href="/config" style="color:#8b949e; text-decoration: none;">Configure switches</a> &middot; <a href="/logs" style="color:#8b949e; text-decoration: none;">Logs</a> &middot; <span class="version-badge" style="background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-weight: 600;">v{{ version }}</span></div>
-        <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+        <div><a href="/" style="color:#8b949e; text-decoration: none;">{{ t('nav.back_to_dashboard') }}</a> &middot; <a href="/config" style="color:#8b949e; text-decoration: none;">{{ t('nav.configure_switches') }}</a> &middot; <a href="/logs" style="color:#8b949e; text-decoration: none;">{{ t('nav.logs') }}</a> &middot; <span class="version-badge" style="background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-weight: 600;">v{{ version }}</span></div>
+        <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
       </div>
 
     </div>
@@ -1792,7 +1794,7 @@
       
       navigator.clipboard.writeText(text).then(() => {
         const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
+        btn.textContent = t('api_docs.common.copied');
         btn.style.color = '#58a6ff';
         btn.style.borderColor = '#58a6ff';
         

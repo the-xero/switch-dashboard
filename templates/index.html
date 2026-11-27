@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ title }}</title>
+<script>window.I18N_LANG={{ lang|tojson }};window.I18N_LOCALE={{ locale|tojson }};window.I18N={{ i18n_json|safe }};</script>
+<script src="/static/i18n.js"></script>
 <link rel="icon" href="/static/logo.png" type="image/png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
     background: #0f1117; color: #e1e4e8; padding: 20px;
   }
   .header {
@@ -114,7 +116,7 @@
     display: inline-flex; align-items: center; gap: 6px;
     padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
     cursor: pointer; transition: all .15s;
-    width: 85px; justify-content: flex-start;
+    min-width: 85px; width: auto; white-space: nowrap; justify-content: flex-start;
   }
   .status-badge:hover { filter: brightness(1.3); }
   .status-badge.up { background: rgba(63,185,80,0.15); color: #3fb950; }
@@ -568,63 +570,63 @@
 <body data-font-size="md">
 <div class="header">
   <div style="display: flex; align-items: center; gap: 14px;">
-    <img src="/static/logo.png" alt="Horaco Logo" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
+    <img src="/static/logo.png" alt="{{ t('common.logo_alt') }}" style="height: 38px; width: 38px; border-radius: 8px; object-fit: cover; border: 1px solid #30363d; box-shadow: 0 0 10px rgba(88, 166, 255, 0.15);">
     <h1>{{ title }}</h1>
   </div>
   <div class="nav-links">
-    <span class="status"><span class="dot" id="live-dot"></span><span id="live-text">Live</span></span>
-    <span class="font-sizes" title="Font size">
+    <span class="status"><span class="dot" id="live-dot"></span><span id="live-text">{{ t('status.live') }}</span></span>
+    <span class="font-sizes" title="{{ t('common.font_size_title') }}">
       <button class="fs-btn" data-size="sm" onclick="setFontSize('sm')">S</button>
       <button class="fs-btn fs-active" data-size="md" onclick="setFontSize('md')">M</button>
       <button class="fs-btn" data-size="lg" onclick="setFontSize('lg')">L</button>
       <button class="fs-btn" data-size="xl" onclick="setFontSize('xl')">XL</button>
     </span>
-    <a href="/" class="active">📊 Dashboard</a>
-    <a href="/map">🕸️ Network Map</a>
-    <a href="/scanner">🌐 Scanner</a>
-    <a href="/config">&#9881; Config</a>
-    <a href="/backups">💾 Backups</a>
-    <a href="/logs">📋 Logs</a>
-    <button onclick="showResetConfirm()">&#128260; Reset</button>
+    <a href="/" class="active">📊 {{ t('nav.dashboard') }}</a>
+    <a href="/map">🕸️ {{ t('nav.network_map') }}</a>
+    <a href="/scanner">🌐 {{ t('nav.scanner') }}</a>
+    <a href="/config">&#9881; {{ t('nav.config') }}</a>
+    <a href="/backups">💾 {{ t('nav.backups') }}</a>
+    <a href="/logs">📋 {{ t('nav.logs') }}</a>
+    <button onclick="showResetConfirm()">&#128260; {{ t('nav.reset') }}</button>
   </div>
 </div>
 <div class="legend-bar" style="display: flex; align-items: center; justify-content: center; gap: 16px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 8px 16px; margin-bottom: 24px; font-size: 11px; color: #8b949e; flex-wrap: wrap; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-  <span style="font-weight: 600; color: #e1e4e8;">PORT STATUS:</span>
+  <span style="font-weight: 600; color: #e1e4e8;">{{ t('dashboard.legend.port_status') }}</span>
   <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #1f6feb; border-radius: 2px;"></span> 10G</span>
   <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #58a6ff; border-radius: 2px;"></span> 2.5G / 2G</span>
   <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #3fb950; border-radius: 2px;"></span> 1G (1000M)</span>
   <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #f08a24; border-radius: 2px;"></span> 100M / 10M</span>
-  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #57606a; border-radius: 2px;"></span> Down</span>
-  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #353c45; border-radius: 2px;"></span> Disabled</span>
+  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #57606a; border-radius: 2px;"></span> {{ t('dashboard.legend.down') }}</span>
+  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #353c45; border-radius: 2px;"></span> {{ t('dashboard.legend.disabled') }}</span>
   <span style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #30363d; padding-left: 12px; margin-left: 4px;">
-    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #8b949e; margin-right: 2px; display: inline-block; vertical-align: middle;"><path d="M 4,8 h 5 v -3 h 6 v 3 h 5 v 11 h -16 z" /></svg> Copper (RJ45)
+    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #8b949e; margin-right: 2px; display: inline-block; vertical-align: middle;"><path d="M 4,8 h 5 v -3 h 6 v 3 h 5 v 11 h -16 z" /></svg> {{ t('dashboard.legend.copper') }}
   </span>
   <span style="display: flex; align-items: center; gap: 6px;">
-    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #8b949e; margin-right: 2px; display: inline-block; vertical-align: middle;"><path d="M 4,5 h 3 v 3 h 10 v -3 h 3 v 14 h -16 z" /></svg> Fiber (SFP+)
+    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #8b949e; margin-right: 2px; display: inline-block; vertical-align: middle;"><path d="M 4,5 h 3 v 3 h 10 v -3 h 3 v 14 h -16 z" /></svg> {{ t('dashboard.legend.fiber') }}
   </span>
 </div>
-<div id="app" class="loading">Loading dashboard</div>
+<div id="app" class="loading">{{ t('dashboard.loading') }}</div>
 <div class="footer">
-  <div>Refreshes every {{ refresh }} seconds &middot; <a href="/config" style="color:#8b949e">Configure Nodes</a> &middot; <a href="/api-docs" style="color:#8b949e">API Reference</a> &middot; <span class="version-badge">v{{ version }}</span></div>
-  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">Created by <a href="https://github.com/byte4geek/switch-dashboard" target="_blank" style="color: #58a6ff; text-decoration: none; font-weight: 500;">Byte4Geek</a> for the community</div>
+  <div>{{ t('dashboard.footer_refresh', refresh=refresh) }} &middot; <a href="/config" style="color:#8b949e">{{ t('nav.configure_nodes') }}</a> &middot; <a href="/api-docs" style="color:#8b949e">{{ t('nav.api_reference') }}</a> &middot; <span class="version-badge">v{{ version }}</span></div>
+  <div style="margin-top: 6px; font-size: 11px; color: #8b949e;">{{ t('common.created_by_html')|safe }}</div>
 </div>
 
 <!-- Speed graph overlay -->
 <div class="graph-overlay" id="graph-overlay" onclick="if(event.target===this)closeGraph()">
   <div class="graph-box" id="graph-box">
     <div class="control-group">
-      <button class="maximize-btn" id="graph-maximize-btn" onclick="toggleMaximizeGraph()" title="Toggle Fullscreen">
+      <button class="maximize-btn" id="graph-maximize-btn" onclick="toggleMaximizeGraph()" title="{{ t('dashboard.graph.toggle_fullscreen') }}">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 1 0v-2h2a.5.5 0 0 0 0-1h-2.5zM11.5 1a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-3a.5.5 0 0 0-.5-.5h-2.5zM1 11.5a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 0-1h-2v-2a.5.5 0 0 0-1 0v3zM14 11.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-3z"/></svg>
       </button>
       <button class="close-btn" onclick="closeGraph()">&times;</button>
     </div>
-    <h3 id="graph-title">Port Speed</h3>
-    <div class="sub" id="graph-sub">Switching parameters...</div>
+    <h3 id="graph-title">{{ t('dashboard.graph.default_title') }}</h3>
+    <div class="sub" id="graph-sub">{{ t('dashboard.graph.loading_sub') }}</div>
     
     <div class="graph-tabs">
-      <button class="graph-tab-btn active" id="tab-live" onclick="setGraphRange('live')">Live (Real-time)</button>
-      <button class="graph-tab-btn" id="tab-1h" onclick="setGraphRange('1h')">1 Hour (High-res)</button>
-      <button class="graph-tab-btn" id="tab-24h" onclick="setGraphRange('24h')">24 Hours (15m avg)</button>
+      <button class="graph-tab-btn active" id="tab-live" onclick="setGraphRange('live')">{{ t('dashboard.graph.tab_live') }}</button>
+      <button class="graph-tab-btn" id="tab-1h" onclick="setGraphRange('1h')">{{ t('dashboard.graph.tab_1h') }}</button>
+      <button class="graph-tab-btn" id="tab-24h" onclick="setGraphRange('24h')">{{ t('dashboard.graph.tab_24h') }}</button>
     </div>
 
     <div class="graph-svg-container" style="position:relative;width:100%">
@@ -633,15 +635,15 @@
     </div>
     
     <div class="graph-stats">
-      <div>TX Peak <span class="val" id="graph-peak-tx">0</span></div>
-      <div>RX Peak <span class="val" id="graph-peak-rx">0</span></div>
-      <div>Current TX <span class="val" id="graph-now-tx">0</span></div>
-      <div>Current RX <span class="val" id="graph-now-rx">0</span></div>
+      <div>{{ t('dashboard.graph.tx_peak') }} <span class="val" id="graph-peak-tx">0</span></div>
+      <div>{{ t('dashboard.graph.rx_peak') }} <span class="val" id="graph-peak-rx">0</span></div>
+      <div>{{ t('dashboard.graph.current_tx') }} <span class="val" id="graph-now-tx">0</span></div>
+      <div>{{ t('dashboard.graph.current_rx') }} <span class="val" id="graph-now-rx">0</span></div>
     </div>
     
     <div class="graph-cumulative-stats">
-      <div>Cumulative TX <span class="val" id="graph-total-tx" style="color: #58a6ff;">0 bytes</span></div>
-      <div>Cumulative RX <span class="val" id="graph-total-rx" style="color: #2ea043;">0 bytes</span></div>
+      <div>{{ t('dashboard.graph.cumulative_tx') }} <span class="val" id="graph-total-tx" style="color: #58a6ff;">0 {{ t('dashboard.graph.bytes_unit') }}</span></div>
+      <div>{{ t('dashboard.graph.cumulative_rx') }} <span class="val" id="graph-total-rx" style="color: #2ea043;">0 {{ t('dashboard.graph.bytes_unit') }}</span></div>
     </div>
   </div>
 </div>
@@ -649,11 +651,11 @@
 <!-- Reset confirm dialog -->
 <div class="confirm-overlay" id="confirm-overlay" onclick="if(event.target===this)hideResetConfirm()">
   <div class="confirm-box">
-    <h3>&#9888; Reset Traffic Counters</h3>
-    <p>This will permanently reset all cumulative byte counters and histories for all switches. This action <strong>cannot be undone</strong>.</p>
+    <h3>&#9888; {{ t('dashboard.reset_modal.title') }}</h3>
+    <p>{{ t('dashboard.reset_modal.desc_html')|safe }}</p>
     <div class="btn-row">
-      <button class="btn-cancel" onclick="hideResetConfirm()">Cancel</button>
-      <button class="btn-danger" onclick="doReset()">Reset Now</button>
+      <button class="btn-cancel" onclick="hideResetConfirm()">{{ t('common.cancel') }}</button>
+      <button class="btn-danger" onclick="doReset()">{{ t('dashboard.reset_modal.confirm') }}</button>
     </div>
   </div>
 </div>
@@ -661,12 +663,12 @@
 <!-- Transceiver diagnostics overlay -->
 <div class="transceiver-overlay" id="transceiver-overlay" onclick="if(event.target===this)closeTransceiver()">
   <div class="transceiver-box" id="transceiver-box">
-    <button class="refresh-btn" onclick="refreshTransceiver()" title="Refresh telemetry">
+    <button class="refresh-btn" onclick="refreshTransceiver()" title="{{ t('dashboard.transceiver.refresh_title') }}">
       <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
     <button class="close-btn" onclick="closeTransceiver()">&times;</button>
-    <h3 id="transceiver-title">SFP+ Transceiver Status</h3>
-    <div class="sub" id="transceiver-sub">Reading DDMI diagnostic telemetry...</div>
+    <h3 id="transceiver-title">{{ t('dashboard.transceiver.title') }}</h3>
+    <div class="sub" id="transceiver-sub">{{ t('dashboard.transceiver.sub') }}</div>
     <div id="transceiver-content">
       <!-- Loaded dynamically via JS -->
     </div>
@@ -693,9 +695,9 @@ function resetCountdown() {
   const liveText = document.getElementById('live-text');
   if (liveText) {
     if (pollingPaused) {
-      liveText.textContent = 'Paused';
+      liveText.textContent = t('status.paused');
     } else {
-      liveText.textContent = `Live (update in ${countdownSeconds}s)`;
+      liveText.textContent = t('status.live_update_in', { seconds: countdownSeconds });
     }
   }
 }
@@ -708,19 +710,19 @@ function startCountdown() {
     if (!liveText || !liveDot) return;
     
     if (pollingPaused) {
-      liveText.textContent = 'Paused';
+      liveText.textContent = t('status.paused');
       liveDot.style.background = '#d29922';
       return;
     }
     
     countdownSeconds--;
     if (countdownSeconds <= 0) {
-      liveText.textContent = 'Updating...';
+      liveText.textContent = t('status.updating');
       liveDot.style.background = '#d29922';
       countdownSeconds = REFRESH_SECONDS;
       updateDashboard();
     } else {
-      liveText.textContent = `Live (update in ${countdownSeconds}s)`;
+      liveText.textContent = t('status.live_update_in', { seconds: countdownSeconds });
       liveDot.style.background = '#3fb950';
     }
   }, 1000);
@@ -844,9 +846,17 @@ function handleResizeEnd(event) {
   });
 }
 
+function translatePortStatus(status) {
+  const s = (status || 'unknown').toLowerCase();
+  if (s === 'up') return t('status.port_up');
+  if (s === 'down') return t('status.port_down');
+  if (s === 'disable' || s === 'disabled') return t('status.port_disabled');
+  return t('status.port_unknown');
+}
+
 const COLUMN_DEFS = {
   port: {
-    label: 'Port',
+    label: t('dashboard.columns.port'),
     thStyle: 'width:55px',
     tdClass: 'port-num',
     tdTitleFn: (p) => {
@@ -858,7 +868,7 @@ const COLUMN_DEFS = {
     render: (p, sw) => p.port
   },
   status: {
-    label: 'Status',
+    label: t('dashboard.columns.status'),
     thStyle: 'width:145px',
     render: (p, sw) => {
       const status = (p.status || 'unknown').toLowerCase();
@@ -869,21 +879,25 @@ const COLUMN_DEFS = {
         const cleanPortName = p.port.split('/')[0];
         const trustState = portsMap[p.port] || portsMap[cleanPortName];
         if (trustState === 'Trusted') {
-          trustBadgeHtml = `<span class="trust-badge trusted" title="DHCP Snooping: Trusted Port">Trusted</span>`;
+          trustBadgeHtml = `<span class="trust-badge trusted" title="${t('dashboard.trust.trusted_title')}">${t('dashboard.trust.trusted')}</span>`;
         } else if (trustState === 'Untrusted') {
-          trustBadgeHtml = `<span class="trust-badge untrusted" title="DHCP Snooping: Untrusted Port">Untrusted</span>`;
+          trustBadgeHtml = `<span class="trust-badge untrusted" title="${t('dashboard.trust.untrusted_title')}">${t('dashboard.trust.untrusted')}</span>`;
         }
       }
-      let duplexText = p.duplex || 'Auto';
-      if (duplexText.toLowerCase() === 'full') {
-        duplexText = 'Full Duplex';
+      let duplexText = p.duplex || t('status.duplex_auto');
+      if (duplexText.toLowerCase() === 'auto') {
+        duplexText = t('status.duplex_auto');
+      } else if (duplexText.toLowerCase() === 'full') {
+        duplexText = t('status.duplex_full');
       } else if (duplexText.toLowerCase() === 'half') {
-        duplexText = 'Half Duplex';
+        duplexText = t('status.duplex_half');
       }
+      const statusLabel = translatePortStatus(status);
+      const portLabel = t('common.port_label', { port: p.port });
       return `
         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span class="status-badge ${status}" onclick="openGraph('${sw.ip}','${p.port}','${sw.name}','Port ${p.port}', ${p.cum_tx || p.tx_bytes || 0}, ${p.cum_rx || p.rx_bytes || 0})"><span class="status-dot ${status}"></span>${status.toUpperCase()}</span>
+            <span class="status-badge ${status}" onclick="openGraph('${sw.ip}','${p.port}','${sw.name}','${portLabel}', ${p.cum_tx || p.tx_bytes || 0}, ${p.cum_rx || p.rx_bytes || 0})"><span class="status-dot ${status}"></span>${statusLabel}</span>
             ${trustBadgeHtml}
           </div>
           <div style="font-size: 10px; color: #8b949e; padding-left: 4px; font-weight: 500;">${duplexText}</div>
@@ -892,25 +906,25 @@ const COLUMN_DEFS = {
     }
   },
   speed: {
-    label: 'Speed',
+    label: t('dashboard.columns.speed'),
     thStyle: 'width:55px',
     tdClassFn: (p) => speedClass(p.speed, p.status),
     tdTitleFn: (p) => p.duplex || '',
     render: (p, sw) => {
       const isSfp = (p.port === '9' || (p.speed || '').toLowerCase().includes('10g') || p.port === 'SFP' || p.port === '9/SFP');
-      const speed = p.speed || 'Auto';
+      const speed = p.speed || t('common.auto');
       if (isSfp) {
-        return `<span class="sfp-speed-link" onclick="openTransceiver('${sw.ip}','${p.port}','${sw.name}')" title="Click to view SFP+ Transceiver Diagnostics">${speed} <svg viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor; display: inline-block;"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-7C7 2 2.73 5.11 1 9.5 2.73 13.89 7 17 12 17s9.27-3.11 11-7.5C21.27 5.11 17 2 12 2zm0 13a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg></span>`;
+        return `<span class="sfp-speed-link" onclick="openTransceiver('${sw.ip}','${p.port}','${sw.name}')" title="${t('dashboard.sfp_title')}">${speed} <svg viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor; display: inline-block;"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-7C7 2 2.73 5.11 1 9.5 2.73 13.89 7 17 12 17s9.27-3.11 11-7.5C21.27 5.11 17 2 12 2zm0 13a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg></span>`;
       } else {
         return speed;
       }
     }
   },
   packets: {
-    label: 'Traffic<br><span style="font-weight:400;color:#8b949e">(packets)</span>',
+    label: t('dashboard.columns.packets_html'),
     thStyle: 'width:90px',
     tdClass: 'mono',
-    tdTitle: 'TX / RX packets',
+    tdTitle: t('dashboard.columns.packets_title'),
     render: (p, sw) => {
       const tx = p.tx_packets || 0;
       const rx = p.rx_packets || 0;
@@ -918,10 +932,10 @@ const COLUMN_DEFS = {
     }
   },
   bytes: {
-    label: 'Traffic<br><span style="font-weight:400;color:#8b949e">(bytes)</span>',
+    label: t('dashboard.columns.bytes_html'),
     thStyle: 'width:90px',
     tdClass: 'mono',
-    tdTitle: 'TX / RX bytes formatted',
+    tdTitle: t('dashboard.columns.bytes_title'),
     render: (p, sw) => {
       const cumTx = p.cum_tx || p.tx_bytes || 0;
       const cumRx = p.cum_rx || p.rx_bytes || 0;
@@ -929,7 +943,7 @@ const COLUMN_DEFS = {
     }
   },
   info: {
-    getLabel: () => `<span id="speed-unit-toggle" class="unit-toggle" onclick="toggleSpeedUnit(event)" title="Toggle speed unit">${speedUnit === 'bps' ? 'BPS' : 'B/s'}</span>`,
+    getLabel: () => `<span id="speed-unit-toggle" class="unit-toggle" onclick="toggleSpeedUnit(event)" title="${t('dashboard.columns.toggle_speed_unit')}">${speedUnit === 'bps' ? 'BPS' : 'B/s'}</span>`,
     tdClass: 'col-info mono',
     render: (p, sw) => {
       const tx = p.speed_tx_bps || 0;
@@ -938,7 +952,7 @@ const COLUMN_DEFS = {
     }
   },
   notes: {
-    label: 'Notes',
+    label: t('dashboard.columns.notes'),
     tdClass: 'col-note',
     render: (p, sw) => {
       return `<input class="note-input" type="text" placeholder="-" value="${p.note || ''}" data-key="${sw.ip}:${p.port}" onfocus="pausePolling()" onblur="saveNote(this)">`;
@@ -1202,7 +1216,7 @@ function manualRefreshMac(ip) {
   const btnText = document.querySelector(`.mac-refresh-btn-${CSS.escape(ip)} span:not(.mac-spinner-${CSS.escape(ip)})`);
   
   if (spinner) spinner.style.display = 'inline-block';
-  if (btnText) btnText.textContent = 'Refreshing...';
+  if (btnText) btnText.textContent = t('dashboard.mac_table.refreshing');
   
   fetch(`/api/switches/${ip}/refresh_mac`, { method: 'POST' })
     .then(r => r.json())
@@ -1211,23 +1225,23 @@ function manualRefreshMac(ip) {
         state.data = data.mac_table || [];
         const headerTime = document.querySelector(`.mac-time-${CSS.escape(ip)}`);
         if (headerTime) {
-          headerTime.textContent = 'Last Scraped: ' + formatTime(Date.now() / 1000);
+          headerTime.textContent = t('dashboard.mac_table.last_scraped', { time: formatTime(Date.now() / 1000) });
         }
         const titleCount = document.querySelector(`.mac-count-${CSS.escape(ip)}`);
         if (titleCount) {
-          titleCount.textContent = `${state.data.length} entries`;
+          titleCount.textContent = t('dashboard.mac_table.entries', { count: state.data.length });
         }
         renderMacTable(ip);
       } else {
-        alert('Failed to refresh MAC table: ' + (data.error || 'Unknown error'));
+        alert(t('dashboard.mac_table.refresh_failed', { error: data.error || t('common.unknown_error') }));
       }
     })
     .catch(err => {
-      alert('Error refreshing MAC table: ' + err.message);
+      alert(t('dashboard.mac_table.refresh_error', { error: err.message }));
     })
     .finally(() => {
       if (spinner) spinner.style.display = 'none';
-      if (btnText) btnText.textContent = 'Refresh MACs';
+      if (btnText) btnText.textContent = t('dashboard.mac_table.refresh');
     });
 }
 
@@ -1235,24 +1249,24 @@ function backupConfig(ip, element) {
   if (element.dataset.loading === 'true') return;
   element.dataset.loading = 'true';
   const originalText = element.innerHTML;
-  element.innerHTML = '⏳ Backing up...';
+  element.innerHTML = '⏳ ' + t('dashboard.backing_up');
   element.style.color = '#8b949e';
 
   fetch(`/api/switches/${ip}/backup`, { method: 'POST' })
     .then(r => r.json())
     .then(data => {
       if (data.status === 'ok') {
-        element.innerHTML = '✓ Backed up!';
+        element.innerHTML = '✓ ' + t('dashboard.backed_up');
         element.style.color = '#3fb950';
       } else {
-        alert('Failed to backup config: ' + (data.error || 'Unknown error'));
-        element.innerHTML = '❌ Failed';
+        alert(t('dashboard.backup_failed_alert', { error: data.error || t('common.unknown_error') }));
+        element.innerHTML = '❌ ' + t('dashboard.backup_failed_badge');
         element.style.color = '#ff7b72';
       }
     })
     .catch(err => {
-      alert('Error during backup: ' + err.message);
-      element.innerHTML = '❌ Failed';
+      alert(t('dashboard.backup_error_alert', { error: err.message }));
+      element.innerHTML = '❌ ' + t('dashboard.backup_failed_badge');
       element.style.color = '#ff7b72';
     })
     .finally(() => {
@@ -1316,7 +1330,7 @@ function renderMacTable(ip) {
   });
 
   if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="padding: 12px; text-align: center; color: #8b949e;">No MAC entries found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="padding: 12px; text-align: center; color: #8b949e;">${t('dashboard.mac_table.empty')}</td></tr>`;
     const container = document.querySelector(`.mac-scroll-container-${CSS.escape(ip)}`);
     if (container) {
       container.scrollTop = state.scrollTop || 0;
@@ -1325,10 +1339,10 @@ function renderMacTable(ip) {
   }
 
   tbody.innerHTML = rows.map(r => {
-    const vendorHtml = r.vendor ? r.vendor : `<a href="/config#vendor-editor-card" style="color: #8b949e; text-decoration: underline;" title="Edit custom vendor list">Unknown</a>`;
+    const vendorHtml = r.vendor ? r.vendor : `<a href="/config#vendor-editor-card" style="color: #8b949e; text-decoration: underline;" title="${t('dashboard.mac_table.edit_vendor_title')}">${t('common.unknown')}</a>`;
     const hostInputHtml = `
       <input type="text" value="${r.host || ''}" 
-             placeholder="Enter nickname..." 
+             placeholder="${t('dashboard.mac_table.enter_nickname')}" 
              onfocus="pausePolling()" 
              onblur="saveHost(this, '${r.mac}')" 
              style="width: 100%; max-width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" 
@@ -1373,7 +1387,7 @@ async function saveHost(input, mac) {
 function pausePolling() {
   pollingPaused = true;
   document.getElementById('live-dot').style.background = '#d29922';
-  document.getElementById('live-text').textContent = 'Paused';
+  document.getElementById('live-text').textContent = t('status.paused');
 }
 
 async function saveNote(input) {
@@ -1441,7 +1455,7 @@ function speedClass(speed, status) {
 function formatTime(ts) {
   if (!ts) return '';
   const d = new Date(ts * 1000);
-  return d.toLocaleTimeString();
+  return d.toLocaleTimeString(window.I18N_LOCALE || undefined);
 }
 
 function renderSwitch(sw) {
@@ -1494,7 +1508,7 @@ function renderSwitch(sw) {
       tooltipParts.push(p.interface);
     }
     const details = tooltipParts.length > 0 ? ` (${tooltipParts.join(' / ')})` : '';
-    const titleText = `Port ${p.port}${details}: ${p.status.toUpperCase()} ${p.speed || ''} (${p.duplex || ''}) - Click to view graph`;
+    const titleText = t('dashboard.port_tooltip', { port: p.port, details: details, status: translatePortStatus(p.status), speed: p.speed || '', duplex: p.duplex || '' });
     const path = isSfp 
       ? 'M 4,5 h 3 v 3 h 10 v -3 h 3 v 14 h -16 z' // SFP (Fiber)
       : 'M 4,8 h 5 v -3 h 6 v 3 h 5 v 11 h -16 z'; // RJ45 (Copper)
@@ -1502,7 +1516,7 @@ function renderSwitch(sw) {
     return `
       <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;" 
            title="${titleText}"
-           onclick="openGraph('${sw.ip}','${p.port}','${sw.name}','Port ${p.port}', ${p.cum_tx || p.tx_bytes || 0}, ${p.cum_rx || p.rx_bytes || 0})">
+           onclick="openGraph('${sw.ip}','${p.port}','${sw.name}','${t('common.port_label', { port: p.port })}', ${p.cum_tx || p.tx_bytes || 0}, ${p.cum_rx || p.rx_bytes || 0})">
         <span style="font-size: 10px; color: #8b949e; font-weight: 700; margin-bottom: 2px;">${p.port}</span>
         <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: ${color}; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); transition: all 0.15s ease-in-out; transform: scale(1);"
              onmouseover="this.style.transform='scale(1.2)';"
@@ -1574,28 +1588,28 @@ function renderSwitch(sw) {
     return `<tr>${cells}</tr>`;
   }).join('');
 
-  const errorBlock = sw.error ? `<div class="error-card">Error: ${sw.error}</div>` : '';
-  const uptime = sw.uptime ? `<span><span class="label">Uptime:</span> <span class="value">${sw.uptime}</span></span>` : '';
-  const mac = sw.mac ? `<span><span class="label">MAC:</span> <span class="value">${sw.mac}</span></span>` : '';
-  const fw = sw.firmware ? `<span><span class="label">Firmware:</span> <span class="value">${sw.firmware}</span></span>` : '';
+  const errorBlock = sw.error ? `<div class="error-card">${t('common.error_prefix', { message: sw.error })}</div>` : '';
+  const uptime = sw.uptime ? `<span><span class="label">${t('dashboard.device_bar.uptime')}</span> <span class="value">${sw.uptime}</span></span>` : '';
+  const mac = sw.mac ? `<span><span class="label">${t('dashboard.device_bar.mac')}</span> <span class="value">${sw.mac}</span></span>` : '';
+  const fw = sw.firmware ? `<span><span class="label">${t('dashboard.device_bar.firmware')}</span> <span class="value">${sw.firmware}</span></span>` : '';
 
   let dhcpBadge = '';
   if (sw.dhcp_snooping) {
     const isActive = sw.dhcp_snooping.enabled;
-    dhcpBadge = `<span><span class="label">DHCP Snooping:</span> <span class="value" style="color: ${isActive ? '#56d364' : '#8b949e'}">${isActive ? '🟢 Active' : '⚪ Inactive'}</span></span>`;
+    dhcpBadge = `<span><span class="label">${t('dashboard.device_bar.dhcp_snooping')}</span> <span class="value" style="color: ${isActive ? '#56d364' : '#8b949e'}">${isActive ? '🟢 ' + t('dashboard.device_bar.active') : '⚪ ' + t('dashboard.device_bar.inactive')}</span></span>`;
   }
 
   let igmpBadge = '';
   if (sw.igmp) {
     const isActive = sw.igmp.enabled;
-    igmpBadge = `<span><span class="label">IGMP Snooping:</span> <span class="value" style="color: ${isActive ? '#56d364' : '#8b949e'}">${isActive ? '🟢 Active' : '⚪ Inactive'}</span></span>`;
+    igmpBadge = `<span><span class="label">${t('dashboard.device_bar.igmp_snooping')}</span> <span class="value" style="color: ${isActive ? '#56d364' : '#8b949e'}">${isActive ? '🟢 ' + t('dashboard.device_bar.active') : '⚪ ' + t('dashboard.device_bar.inactive')}</span></span>`;
   }
 
   let jumboBadge = '';
   if (sw.jumbo_frame) {
     const isActive = sw.jumbo_frame.enabled;
     const sizeVal = sw.jumbo_frame.size;
-    jumboBadge = `<span><span class="label">Jumbo Frame:</span> <span class="value" style="color: ${isActive ? '#56d364' : '#8b949e'}">${isActive ? '🟢 Active (' + sizeVal + ')' : '⚪ Inactive'}</span></span>`;
+    jumboBadge = `<span><span class="label">${t('dashboard.device_bar.jumbo_frame')}</span> <span class="value" style="color: ${isActive ? '#56d364' : '#8b949e'}">${isActive ? '🟢 ' + t('dashboard.device_bar.active') + ' (' + sizeVal + ')' : '⚪ ' + t('dashboard.device_bar.inactive')}</span></span>`;
   }
 
   const macState = getMacState(sw.ip);
@@ -1603,43 +1617,43 @@ function renderSwitch(sw) {
   const displayStyle = isExpanded ? 'block' : 'none';
   const arrowTransform = isExpanded ? 'rotate(90deg)' : 'rotate(0deg)';
   const macCount = sw.mac_table ? sw.mac_table.length : 0;
-  const lastScrapedStr = sw.mac_timestamp ? formatTime(sw.mac_timestamp) : 'Never';
+  const lastScrapedStr = sw.mac_timestamp ? formatTime(sw.mac_timestamp) : t('common.never');
 
   const macSectionHtml = `
     <div class="mac-section" style="border-top: 1px solid #30363d; padding: 12px 20px; background: rgba(22, 27, 34, 0.2);">
       <div class="mac-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="toggleMacTable('${sw.ip}')">
         <h4 style="font-size: 12px; font-weight: 600; color: #8b949e; display: flex; align-items: center; gap: 6px; margin: 0;">
           <span class="mac-toggle-arrow-${sw.ip}" style="display: inline-block; transition: transform 0.2s; transform: ${arrowTransform}; font-size: 10px;">&gt;</span>
-          <span>📁 MAC Address Table (<span class="mac-count-${sw.ip}">${macCount} entries</span>)</span>
+          <span>📁 ${t('dashboard.mac_table.title')} (<span class="mac-count-${sw.ip}">${t('dashboard.mac_table.entries', { count: macCount })}</span>)</span>
         </h4>
-        <span class="mac-time-${sw.ip}" style="font-size: 10px; color: #8b949e;">Last Scraped: ${lastScrapedStr}</span>
+        <span class="mac-time-${sw.ip}" style="font-size: 10px; color: #8b949e;">${t('dashboard.mac_table.last_scraped', { time: lastScrapedStr })}</span>
       </div>
       
       <div class="mac-content-${sw.ip}" style="display: ${displayStyle}; margin-top: 12px;">
         <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
           <button class="mac-refresh-btn-${sw.ip}" onclick="manualRefreshMac('${sw.ip}')" style="background: #21262d; border: 1px solid #30363d; border-radius: 6px; padding: 6px 12px; color: #c9d1d9; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;" onmouseover="this.style.background='#30363d'; this.style.borderColor='#8b949e';" onmouseout="this.style.background='#21262d'; this.style.borderColor='#30363d';">
             <span class="mac-spinner-${sw.ip}" style="display: none; width: 12px; height: 12px; border: 2px solid transparent; border-top-color: #58a6ff; border-radius: 50%; animation: spin .8s linear infinite; box-sizing: border-box;"></span>
-            <span>Refresh MACs</span>
+            <span>${t('dashboard.mac_table.refresh')}</span>
           </button>
         </div>
         <div class="mac-scroll-container-${sw.ip}" onscroll="saveMacScroll('${sw.ip}', this)" onmouseup="saveMacHeight('${sw.ip}', this)" ontouchend="saveMacHeight('${sw.ip}', this)" style="height: ${macState.height || '450px'}; min-height: 150px; max-height: 1200px; resize: vertical; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);">
           <table class="mac-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
             <thead>
               <tr style="background: #161b22; position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #30363d;">
-                ${renderMacTh('mac', 'MAC Address')}
-                ${renderMacTh('host', 'Host')}
-                ${renderMacTh('vendor', 'Vendor')}
-                ${renderMacTh('type', 'Type')}
-                ${renderMacTh('port', 'Port')}
-                ${renderMacTh('vlan', 'VLAN')}
+                ${renderMacTh('mac', t('dashboard.mac_table.col_mac'))}
+                ${renderMacTh('host', t('dashboard.mac_table.col_host'))}
+                ${renderMacTh('vendor', t('dashboard.mac_table.col_vendor'))}
+                ${renderMacTh('type', t('dashboard.mac_table.col_type'))}
+                ${renderMacTh('port', t('dashboard.mac_table.col_port'))}
+                ${renderMacTh('vlan', t('dashboard.mac_table.col_vlan'))}
               </tr>
               <tr style="background: #0d1117; position: sticky; top: 31px; z-index: 2; border-bottom: 1px solid #30363d;">
-                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-mac-${sw.ip}" placeholder="Filter MAC..." value="${macState.filters ? macState.filters.mac : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
-                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-host-${sw.ip}" placeholder="Filter Host..." value="${macState.filters ? macState.filters.host : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
-                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-vendor-${sw.ip}" placeholder="Filter Vendor..." value="${macState.filters ? macState.filters.vendor : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
-                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-type-${sw.ip}" placeholder="Filter Type..." value="${macState.filters ? macState.filters.type : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
-                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-port-${sw.ip}" placeholder="Port..." value="${macState.filters ? macState.filters.port : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
-                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-vlan-${sw.ip}" placeholder="VLAN..." value="${macState.filters ? macState.filters.vlan : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
+                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-mac-${sw.ip}" placeholder="${t('dashboard.mac_table.filter_mac')}" value="${macState.filters ? macState.filters.mac : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
+                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-host-${sw.ip}" placeholder="${t('dashboard.mac_table.filter_host')}" value="${macState.filters ? macState.filters.host : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
+                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-vendor-${sw.ip}" placeholder="${t('dashboard.mac_table.filter_vendor')}" value="${macState.filters ? macState.filters.vendor : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
+                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-type-${sw.ip}" placeholder="${t('dashboard.mac_table.filter_type')}" value="${macState.filters ? macState.filters.type : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
+                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-port-${sw.ip}" placeholder="${t('dashboard.mac_table.filter_port')}" value="${macState.filters ? macState.filters.port : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
+                <th style="padding: 4px 6px;"><input type="text" class="mac-filter-vlan-${sw.ip}" placeholder="${t('dashboard.mac_table.filter_vlan')}" value="${macState.filters ? macState.filters.vlan : ''}" onfocus="focusMacSearch()" onblur="blurMacSearch()" oninput="filterMacTable('${sw.ip}')" style="width: 100%; background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #e1e4e8; font-size: 11px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></th>
               </tr>
             </thead>
             <tbody class="mac-tbody-${sw.ip}">
@@ -1658,7 +1672,7 @@ function renderSwitch(sw) {
   const igmpEntries = sw.igmp && sw.igmp.entries ? sw.igmp.entries : [];
   const igmpCount = igmpEntries.length;
 
-  let igmpRows = '<tr><td colspan="3" style="padding: 12px; text-align: center; color: #8b949e;">No active multicast groups detected</td></tr>';
+  let igmpRows = `<tr><td colspan="3" style="padding: 12px; text-align: center; color: #8b949e;">${t('dashboard.igmp.empty')}</td></tr>`;
   if (igmpEntries.length > 0) {
     igmpRows = igmpEntries.map(e => `
       <tr style="border-bottom: 1px solid #21262d; transition: background 0.15s;" onmouseover="this.style.background='#1c2128'" onmouseout="this.style.background='transparent'">
@@ -1674,7 +1688,7 @@ function renderSwitch(sw) {
       <div class="igmp-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="toggleIgmpTable('${sw.ip}')">
         <h4 style="font-size: 12px; font-weight: 600; color: #8b949e; display: flex; align-items: center; gap: 6px; margin: 0;">
           <span class="igmp-toggle-arrow-${sw.ip}" style="display: inline-block; transition: transform 0.2s; transform: ${igmpArrowTransform}; font-size: 10px;">&gt;</span>
-          <span>📁 IGMP Multicast Groups (<span class="igmp-count-${sw.ip}">${igmpCount} entries</span>)</span>
+          <span>📁 ${t('dashboard.igmp.title')} (<span class="igmp-count-${sw.ip}">${t('dashboard.igmp.entries', { count: igmpCount })}</span>)</span>
         </h4>
       </div>
       
@@ -1683,9 +1697,9 @@ function renderSwitch(sw) {
           <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
             <thead>
               <tr style="background: #161b22; border-bottom: 1px solid #30363d;">
-                <th style="padding: 8px 12px; color: #8b949e; font-weight: 600; width: 45%;">Multicast IP</th>
-                <th style="padding: 8px 12px; color: #8b949e; font-weight: 600; width: 35%;">Member Ports</th>
-                <th style="padding: 8px 12px; color: #8b949e; font-weight: 600; width: 20%;">VLAN</th>
+                <th style="padding: 8px 12px; color: #8b949e; font-weight: 600; width: 45%;">${t('dashboard.igmp.col_ip')}</th>
+                <th style="padding: 8px 12px; color: #8b949e; font-weight: 600; width: 35%;">${t('dashboard.igmp.col_ports')}</th>
+                <th style="padding: 8px 12px; color: #8b949e; font-weight: 600; width: 20%;">${t('dashboard.igmp.col_vlan')}</th>
               </tr>
             </thead>
             <tbody>
@@ -1700,13 +1714,13 @@ function renderSwitch(sw) {
   return `<div class="switch-card">
     <div class="switch-header">
       <div style="display: flex; align-items: center; gap: 12px;">
-        <img src="/api/switches/${sw.ip}/image" alt="Switch" style="height: 24px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+        <img src="/api/switches/${sw.ip}/image" alt="${t('dashboard.switch_alt')}" style="height: 24px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
         <div>
           <h2>${sw.name}</h2>
           <span style="font-size:12px;color:#b1bac4;display:flex;align-items:center;gap:8px;">
-            <a href="http://${sw.ip}/" target="_blank" style="color:#58a6ff;text-decoration:none" title="Open switch web UI">${sw.ip}</a>
+            <a href="http://${sw.ip}/" target="_blank" style="color:#58a6ff;text-decoration:none" title="${t('dashboard.open_web_ui')}">${sw.ip}</a>
             <span style="color:#30363d">|</span>
-            <a href="#" onclick="backupConfig('${sw.ip}', this); return false;" style="color:#58a6ff;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;" title="Backup configuration on server">💾 Backup</a>
+            <a href="#" onclick="backupConfig('${sw.ip}', this); return false;" style="color:#58a6ff;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;" title="${t('dashboard.backup_title')}">💾 ${t('dashboard.backup_btn')}</a>
           </span>
         </div>
       </div>
@@ -1728,12 +1742,12 @@ function renderSwitch(sw) {
       <thead><tr>
         ${theadCols}
       </tr></thead>
-      <tbody>${portRows || `<tr><td colspan="${activeColumnOrder.length}" style="padding:20px;text-align:center;color:#b1bac4">No data</td></tr>`}</tbody>
+      <tbody>${portRows || `<tr><td colspan="${activeColumnOrder.length}" style="padding:20px;text-align:center;color:#b1bac4">${t('dashboard.no_data')}</td></tr>`}</tbody>
     </table>
     ${errorBlock}
     ${macSectionHtml}
     ${igmpSectionHtml}
-    <div class="last-update">Last update: ${formatTime(sw.timestamp)}</div>
+    <div class="last-update">${t('dashboard.last_update', { time: formatTime(sw.timestamp) })}</div>
   </div>`;
 }
 
@@ -1742,16 +1756,16 @@ async function updateDashboard() {
   const liveDot = document.getElementById('live-dot');
   const liveText = document.getElementById('live-text');
   liveDot.style.background = '#d29922';
-  liveText.textContent = 'Updating...';
+  liveText.textContent = t('status.updating');
   try {
     const r = await fetch('/api/switches');
     const data = await r.json();
     const app = document.getElementById('app');
     if (!data || data.length === 0) {
-      app.innerHTML = '<div style="text-align:center;padding:40px;color:#b1bac4">No nodes configured. <a href="/config" style="color:#58a6ff">Configure now</a></div>';
+      app.innerHTML = `<div style="text-align:center;padding:40px;color:#b1bac4">${t('dashboard.no_nodes_configured')} <a href="/config" style="color:#58a6ff">${t('dashboard.configure_now')}</a></div>`;
       app.className = '';
       liveDot.style.background = '#f85149';
-      liveText.textContent = 'No nodes';
+      liveText.textContent = t('status.no_nodes');
       return;
     }
     
@@ -1788,8 +1802,8 @@ async function updateDashboard() {
         if (currentPortObj) {
           const totalTx = currentPortObj.cum_tx || currentPortObj.tx_bytes || 0;
           const totalRx = currentPortObj.cum_rx || currentPortObj.rx_bytes || 0;
-          document.getElementById('graph-total-tx').innerHTML = `${totalTx.toLocaleString()} bytes <span style="font-weight:400;color:#8b949e">(${formatBytes(totalTx)})</span>`;
-          document.getElementById('graph-total-rx').innerHTML = `${totalRx.toLocaleString()} bytes <span style="font-weight:400;color:#8b949e">(${formatBytes(totalRx)})</span>`;
+          document.getElementById('graph-total-tx').innerHTML = `${formatLocaleNumber(totalTx)} ${t('dashboard.graph.bytes_unit')} <span style="font-weight:400;color:#8b949e">(${formatBytes(totalTx)})</span>`;
+          document.getElementById('graph-total-rx').innerHTML = `${formatLocaleNumber(totalRx)} ${t('dashboard.graph.bytes_unit')} <span style="font-weight:400;color:#8b949e">(${formatBytes(totalRx)})</span>`;
         }
       }
     }
@@ -1797,9 +1811,9 @@ async function updateDashboard() {
     resetCountdown();
   } catch (e) {
     document.getElementById('app').innerHTML =
-      `<div style="text-align:center;padding:40px;color:#f85149">Connection error: ${e.message}</div>`;
+      `<div style="text-align:center;padding:40px;color:#f85149">${t('dashboard.connection_error', { message: e.message })}</div>`;
     liveDot.style.background = '#f85149';
-    liveText.textContent = 'Error';
+    liveText.textContent = t('status.error');
   }
 }
 
@@ -1810,12 +1824,12 @@ function openGraph(ip, port, name, label, totalTx = 0, totalRx = 0) {
   currentGraphSwitchName = name;
   currentGraphPortLabel = label;
   
-  document.getElementById('graph-title').textContent = label + ' Speed (' + name + ')';
+  document.getElementById('graph-title').textContent = t('dashboard.graph.title_fmt', { label: label, name: name });
   document.getElementById('graph-overlay').classList.add('open');
   
   // Update cumulative traffic display
-  document.getElementById('graph-total-tx').innerHTML = `${totalTx.toLocaleString()} bytes <span style="font-weight:400;color:#8b949e">(${formatBytes(totalTx)})</span>`;
-  document.getElementById('graph-total-rx').innerHTML = `${totalRx.toLocaleString()} bytes <span style="font-weight:400;color:#8b949e">(${formatBytes(totalRx)})</span>`;
+  document.getElementById('graph-total-tx').innerHTML = `${formatLocaleNumber(totalTx)} ${t('dashboard.graph.bytes_unit')} <span style="font-weight:400;color:#8b949e">(${formatBytes(totalTx)})</span>`;
+  document.getElementById('graph-total-rx').innerHTML = `${formatLocaleNumber(totalRx)} ${t('dashboard.graph.bytes_unit')} <span style="font-weight:400;color:#8b949e">(${formatBytes(totalRx)})</span>`;
   
   setGraphRange(currentGraphRange); // trigger render
 }
@@ -1827,13 +1841,13 @@ function setGraphRange(range) {
   document.querySelectorAll('.graph-tab-btn').forEach(btn => btn.classList.remove('active'));
   if (range === 'live') {
     document.getElementById('tab-live').classList.add('active');
-    document.getElementById('graph-sub').textContent = `Real-time speed at ${REFRESH_SECONDS}s polling intervals`;
+    document.getElementById('graph-sub').textContent = t('dashboard.graph.sub_live', { seconds: REFRESH_SECONDS });
   } else if (range === '1h') {
     document.getElementById('tab-1h').classList.add('active');
-    document.getElementById('graph-sub').textContent = `Last 1 hour speed history (at ${REFRESH_SECONDS}s polling intervals)`;
+    document.getElementById('graph-sub').textContent = t('dashboard.graph.sub_1h', { seconds: REFRESH_SECONDS });
   } else if (range === '24h') {
     document.getElementById('tab-24h').classList.add('active');
-    document.getElementById('graph-sub').textContent = 'Last 24 hours speed history (15-minute averages)';
+    document.getElementById('graph-sub').textContent = t('dashboard.graph.sub_24h');
   }
   
   renderGraph(currentGraphIp, currentGraphPort);
@@ -1846,7 +1860,7 @@ function closeGraph() {
     box.classList.remove('maximized');
     const btn = document.getElementById('graph-maximize-btn');
     btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 1 0v-2h2a.5.5 0 0 0 0-1h-2.5zM11.5 1a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-3a.5.5 0 0 0-.5-.5h-2.5zM1 11.5a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 0-1h-2v-2a.5.5 0 0 0-1 0v3zM14 11.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-3z"/></svg>`;
-    btn.title = "Toggle Fullscreen";
+    btn.title = t("dashboard.graph.toggle_fullscreen");
   }
   currentGraphIp = null;
   currentGraphPort = null;
@@ -1860,10 +1874,10 @@ function toggleMaximizeGraph() {
   const btn = document.getElementById('graph-maximize-btn');
   if (box.classList.contains('maximized')) {
     btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 1.5a.5.5 0 0 0-1 0v2h-2a.5.5 0 0 0 0 1h2.5a.5.5 0 0 0 .5-.5v-2.5zM11.5 1.5a.5.5 0 0 0-1 0v2.5a.5.5 0 0 0 .5.5h2.5a.5.5 0 0 0 0-1h-2v-2zM4.5 11.5v2a.5.5 0 0 0 1 0v-2.5a.5.5 0 0 0-.5-.5h-2.5a.5.5 0 0 0 0 1h2zM12.5 11.5h-2a.5.5 0 0 0-.5.5v2.5a.5.5 0 0 0 1 0v-2h2a.5.5 0 0 0 0-1z"/></svg>`;
-    btn.title = "Restore Size";
+    btn.title = t("dashboard.graph.restore_size");
   } else {
     btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 1 0v-2h2a.5.5 0 0 0 0-1h-2.5zM11.5 1a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-3a.5.5 0 0 0-.5-.5h-2.5zM1 11.5a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 0-1h-2v-2a.5.5 0 0 0-1 0v3zM14 11.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0 0 1h2v2a.5.5 0 0 0 1 0v-3z"/></svg>`;
-    btn.title = "Toggle Fullscreen";
+    btn.title = t("dashboard.graph.toggle_fullscreen");
   }
   
   if (currentGraphIp && currentGraphPort) {
@@ -1892,7 +1906,7 @@ function renderGraph(ip, port) {
     .then(r => r.json())
     .then(data => {
       if (!data || !data.tx || data.tx.length < 2) {
-        svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#b1bac4" font-size="14">No history data available for this range yet</text>`;
+        svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#b1bac4" font-size="14">${t('dashboard.graph.no_history')}</text>`;
         document.getElementById('graph-peak-tx').textContent = '-';
         document.getElementById('graph-peak-rx').textContent = '-';
         document.getElementById('graph-now-tx').textContent = '-';
@@ -1950,9 +1964,9 @@ function renderGraph(ip, port) {
       const xTicksSvg = xTicks.map(idx => {
         const x = toX(idx);
         const date = new Date(tss[idx] * 1000);
-        let timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+        let timeStr = date.toLocaleTimeString(window.I18N_LOCALE || undefined, {hour: '2-digit', minute: '2-digit', second: '2-digit'});
         if (currentGraphRange === '24h') {
-          timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + '<br>' + (date.getMonth()+1) + '/' + date.getDate();
+          timeStr = date.toLocaleTimeString(window.I18N_LOCALE || undefined, {hour: '2-digit', minute: '2-digit'}) + '<br>' + (date.getMonth()+1) + '/' + date.getDate();
         }
         return `
           <line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + plotH}" stroke="#21262d" stroke-dasharray="4 4" stroke-width="0.5"/>
@@ -2013,11 +2027,11 @@ function renderGraph(ip, port) {
         <!-- Legend labels -->
         <g transform="translate(${W - pad.right - 90}, ${pad.top + 5})">
           <rect x="0" y="0" width="12" height="12" fill="#58a6ff" rx="3"/>
-          <text x="18" y="10" fill="#b1bac4" font-size="11" font-weight="600">TX Speed</text>
+          <text x="18" y="10" fill="#b1bac4" font-size="11" font-weight="600">${t('dashboard.graph.tx_speed')}</text>
         </g>
         <g transform="translate(${W - pad.right - 90}, ${pad.top + 22})">
           <rect x="0" y="0" width="12" height="12" fill="#3fb950" rx="3"/>
-          <text x="18" y="10" fill="#b1bac4" font-size="11" font-weight="600">RX Speed</text>
+          <text x="18" y="10" fill="#b1bac4" font-size="11" font-weight="600">${t('dashboard.graph.rx_speed')}</text>
         </g>
 
         <!-- Hover Guideline / Interactive Crosshair components -->
@@ -2069,9 +2083,9 @@ function renderGraph(ip, port) {
 
         // Position & Show Tooltip Panel
         const date = new Date(tss[idx] * 1000);
-        let timeStr = date.toLocaleTimeString();
+        let timeStr = date.toLocaleTimeString(window.I18N_LOCALE || undefined);
         if (currentGraphRange === '24h') {
-          timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          timeStr = date.toLocaleDateString(window.I18N_LOCALE || undefined) + ' ' + date.toLocaleTimeString(window.I18N_LOCALE || undefined, {hour: '2-digit', minute:'2-digit'});
         }
 
         tooltip.innerHTML = `
@@ -2098,7 +2112,7 @@ function renderGraph(ip, port) {
       });
     })
     .catch(e => {
-      svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#f85149" font-size="14">Error loading history: ${e.message}</text>`;
+      svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#f85149" font-size="14">${t('dashboard.graph.error_history', { error: e.message })}</text>`;
     });
 }
 
@@ -2117,14 +2131,14 @@ function openTransceiver(ip, port, switchName) {
   const sub = document.getElementById('transceiver-sub');
   const content = document.getElementById('transceiver-content');
   
-  title.textContent = `Port ${port} SFP+ Transceiver Status`;
-  sub.textContent = `DDMI Diagnostics & Telemetry (${switchName})`;
+  title.textContent = t('dashboard.transceiver.title_fmt', { port: port });
+  sub.textContent = t('dashboard.transceiver.sub_fmt', { name: switchName });
   
   // Show loading state
   content.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; gap: 12px; color: #8b949e;">
       <div style="width: 24px; height: 24px; border: 2px solid transparent; border-top-color: #58a6ff; border-radius: 50%; animation: spin .8s linear infinite; box-sizing: border-box;"></div>
-      <span>Fetching transceiver data from switch...</span>
+      <span>${t('dashboard.transceiver.fetching')}</span>
     </div>
   `;
   
@@ -2133,7 +2147,7 @@ function openTransceiver(ip, port, switchName) {
   fetch(`/api/switches/${ip}/transceiver`)
     .then(r => {
       if (!r.ok) {
-        return r.json().then(err => { throw new Error(err.error || 'Request failed'); });
+        return r.json().then(err => { throw new Error(err.error || t('dashboard.transceiver.request_failed')); });
       }
       return r.json();
     })
@@ -2143,7 +2157,7 @@ function openTransceiver(ip, port, switchName) {
     .catch(err => {
       content.innerHTML = `
         <div class="error-card" style="margin: 20px 0; font-size: 13px;">
-          <strong>No SFP module detected or telemetry unavailable</strong><br>
+          <strong>${t('dashboard.transceiver.unavailable')}</strong><br>
           <span style="opacity: 0.8; font-size: 11px;">${err.message}</span>
         </div>
       `;
@@ -2196,35 +2210,35 @@ function renderTransceiverData(data, container) {
       <div class="transceiver-card">
         <h4>
           <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; display: inline-block; vertical-align: middle;"><path d="M4,5 h3 v3 h10 v -3 h 3 v 14 h -16 z" /></svg>
-          SFP Module Details
+          ${t('dashboard.transceiver.details_title')}
         </h4>
-        <div class="transceiver-item"><span class="label">OE Present</span><span class="val">${data.oe_present || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Loss of Signal</span><span class="val">${data.loss_of_signal || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Transceiver Type</span><span class="val">${data.transceiver_type || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Connector Type</span><span class="val">${data.connector_type || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Compliance Codes</span><span class="val">${data.eth_compliance_codes || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Wavelength</span><span class="val">${data.wavelength || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Bitrate</span><span class="val">${data.bitrate || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Vendor Name</span><span class="val">${(data.vendor_name || 'Unknown').trim()}</span></div>
-        <div class="transceiver-item"><span class="label">Vendor OUI</span><span class="val">${data.vendor_oui || 'Unknown'}</span></div>
-        <div class="transceiver-item"><span class="label">Part Number</span><span class="val">${(data.vendor_pn || 'Unknown').trim()}</span></div>
-        <div class="transceiver-item"><span class="label">Revision</span><span class="val">${(data.vendor_revision || 'Unknown').trim()}</span></div>
-        <div class="transceiver-item"><span class="label">Serial Number</span><span class="val">${(data.vendor_sn || 'Unknown').trim()}</span></div>
-        <div class="transceiver-item"><span class="label">Date Code</span><span class="val">${data.date_code || 'Unknown'}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.oe_present')}</span><span class="val">${data.oe_present || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.loss_of_signal')}</span><span class="val">${data.loss_of_signal || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.transceiver_type')}</span><span class="val">${data.transceiver_type || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.connector_type')}</span><span class="val">${data.connector_type || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.compliance_codes')}</span><span class="val">${data.eth_compliance_codes || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.wavelength')}</span><span class="val">${data.wavelength || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.bitrate')}</span><span class="val">${data.bitrate || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.vendor_name')}</span><span class="val">${(data.vendor_name || t('common.unknown')).trim()}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.vendor_oui')}</span><span class="val">${data.vendor_oui || t('common.unknown')}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.part_number')}</span><span class="val">${(data.vendor_pn || t('common.unknown')).trim()}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.revision')}</span><span class="val">${(data.vendor_revision || t('common.unknown')).trim()}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.serial_number')}</span><span class="val">${(data.vendor_sn || t('common.unknown')).trim()}</span></div>
+        <div class="transceiver-item"><span class="label">${t('dashboard.transceiver.date_code')}</span><span class="val">${data.date_code || t('common.unknown')}</span></div>
       </div>
       
       <!-- DDMI Real-Time Telemetry Card -->
       <div class="transceiver-card">
         <h4>
           <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; display: inline-block; vertical-align: middle;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2v-2h4v8zm0-10h-2V5h2v2z"/></svg>
-          DDMI Diagnostics
+          ${t('dashboard.transceiver.ddmi_title')}
         </h4>
         
         <!-- Temperature -->
         <div class="telemetry-row">
           <div class="header-row">
-            <span class="label">🌡️ Temperature</span>
-            <span class="val" style="color: ${tempColor};">${data.temperature || 'N/A'}</span>
+            <span class="label">🌡️ ${t('dashboard.transceiver.temperature')}</span>
+            <span class="val" style="color: ${tempColor};">${data.temperature || t('common.na')}</span>
           </div>
           <div class="telemetry-bar-bg">
             <div class="telemetry-bar-fill" style="width: ${tempPct}%; background: ${tempColor};"></div>
@@ -2234,8 +2248,8 @@ function renderTransceiverData(data, container) {
         <!-- Voltage -->
         <div class="telemetry-row">
           <div class="header-row">
-            <span class="label">⚡ Supply Voltage</span>
-            <span class="val" style="color: ${voltColor};">${data.voltage || 'N/A'}</span>
+            <span class="label">⚡ ${t('dashboard.transceiver.supply_voltage')}</span>
+            <span class="val" style="color: ${voltColor};">${data.voltage || t('common.na')}</span>
           </div>
           <div class="telemetry-bar-bg">
             <div class="telemetry-bar-fill" style="width: ${voltPct}%; background: ${voltColor};"></div>
@@ -2245,8 +2259,8 @@ function renderTransceiverData(data, container) {
         <!-- Current -->
         <div class="telemetry-row">
           <div class="header-row">
-            <span class="label">🔋 Bias Current</span>
-            <span class="val" style="color: ${currColor};">${data.current || 'N/A'}</span>
+            <span class="label">🔋 ${t('dashboard.transceiver.bias_current')}</span>
+            <span class="val" style="color: ${currColor};">${data.current || t('common.na')}</span>
           </div>
           <div class="telemetry-bar-bg">
             <div class="telemetry-bar-fill" style="width: ${currPct}%; background: ${currColor};"></div>
@@ -2256,8 +2270,8 @@ function renderTransceiverData(data, container) {
         <!-- TX Power -->
         <div class="telemetry-row">
           <div class="header-row">
-            <span class="label">📤 Optical TX Power</span>
-            <span class="val" style="color: ${txColor};">${data.tx_power || 'N/A'}</span>
+            <span class="label">📤 ${t('dashboard.transceiver.tx_power')}</span>
+            <span class="val" style="color: ${txColor};">${data.tx_power || t('common.na')}</span>
           </div>
           <div class="telemetry-bar-bg">
             <div class="telemetry-bar-fill" style="width: ${txPct}%; background: ${txColor};"></div>
@@ -2267,8 +2281,8 @@ function renderTransceiverData(data, container) {
         <!-- RX Power -->
         <div class="telemetry-row">
           <div class="header-row">
-            <span class="label">📥 Optical RX Power</span>
-            <span class="val" style="color: ${rxColor};">${data.rx_power || 'N/A'}</span>
+            <span class="label">📥 ${t('dashboard.transceiver.rx_power')}</span>
+            <span class="val" style="color: ${rxColor};">${data.rx_power || t('common.na')}</span>
           </div>
           <div class="telemetry-bar-bg">
             <div class="telemetry-bar-fill" style="width: ${rxPct}%; background: ${rxColor};"></div>
@@ -2276,7 +2290,7 @@ function renderTransceiverData(data, container) {
         </div>
         
         <div style="margin-top: 18px; padding: 10px; background: rgba(88,166,255,0.05); border: 1px solid rgba(88,166,255,0.15); border-radius: 6px; font-size: 11px; color: #8b949e; line-height: 1.4;">
-          💡 Telemetry values are updated directly from the switch's internal SFP micro-controller registers using DDMI.
+          💡 ${t('dashboard.transceiver.ddmi_note')}
         </div>
       </div>
     </div>
